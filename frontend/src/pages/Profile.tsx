@@ -48,7 +48,11 @@ export default function Profile() {
             <div className="stats">
               <div className="stat">
                 <span className="stat-value">{stats.validated}</span>
-                <span className="stat-label mono">validés</span>
+                <span className="stat-label mono">signés</span>
+              </div>
+              <div className="stat">
+                <span className="stat-value">{stats.found}</span>
+                <span className="stat-label mono">trouvés</span>
               </div>
               <div className="stat">
                 <span className="stat-value">{stats.attempts}</span>
@@ -80,7 +84,7 @@ export default function Profile() {
                         {r.assignedOn.slice(0, 10)}
                       </td>
                       <td className="mono">
-                        {r.status === 'playing' ? '—' : r.targetLogin}
+                        {r.targetLogin ?? '—'}
                       </td>
                       <td className={`status ${r.status}`}>
                         {STATUS_LABEL[r.status]}

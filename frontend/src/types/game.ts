@@ -48,12 +48,13 @@ export interface LeaderboardRow {
   login: string
   ftPfpUrl: string | null
   validated: number
+  found: number
   attempts: number
   played: number
 }
 
 export interface UserRound {
-  targetLogin: string
+  targetLogin: string | null
   status: RoundStatus
   attempts: number
   assignedOn: string
@@ -67,6 +68,7 @@ export interface UserStats {
   campus: string | null
   createdAt: string
   validated: number
+  found: number
   attempts: number
   played: number
   rounds: UserRound[]

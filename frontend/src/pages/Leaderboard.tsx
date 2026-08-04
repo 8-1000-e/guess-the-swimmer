@@ -33,7 +33,8 @@ export default function Leaderboard() {
               <tr>
                 <th></th>
                 <th>Joueur</th>
-                <th className="num">Validés</th>
+                <th className="num">Signés</th>
+                <th className="num">Trouvés</th>
                 <th className="num">Essais</th>
                 <th className="num">Manches</th>
               </tr>
@@ -54,6 +55,7 @@ export default function Leaderboard() {
                     </Link>
                   </td>
                   <td className="num mono">{r.validated}</td>
+                  <td className="num mono">{r.found}</td>
                   <td className="num mono">{r.attempts}</td>
                   <td className="num mono muted">{r.played}</td>
                 </tr>
@@ -63,7 +65,7 @@ export default function Leaderboard() {
         )}
 
         <p className="hint mono">
-          Le plus de cibles validées d'abord, puis le moins d'essais.
+          Cibles signées d'abord, puis trouvées, puis le moins d'essais.
         </p>
       </main>
     </AppShell>
