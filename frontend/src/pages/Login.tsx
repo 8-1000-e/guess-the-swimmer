@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import { useAuth } from '@/auth/useAuth'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import AnimatedGradient from '@/components/ui/animated-gradient'
+import type { LetterState } from '@/types/game'
 
 const ERRORS: Record<string, { title: string; hint: string }> = {
   invalid_state: {
@@ -19,7 +20,29 @@ const ERRORS: Record<string, { title: string; hint: string }> = {
   },
 }
 
-const SIZE = 8
+const DEMO_SECRET = 'natation'
+const SIZE = DEMO_SECRET.length
+
+function score(guess: string, target: string): LetterState[] {
+  const states: LetterState[] = [...guess].map(() => 'absent')
+  const left = new Map<string, number>()
+
+  for (let i = 0; i < target.length; i++) {
+    if (guess[i] === target[i]) states[i] = 'correct'
+    else left.set(target[i], (left.get(target[i]) ?? 0) + 1)
+  }
+
+  for (let i = 0; i < states.length; i++) {
+    if (states[i] === 'correct') continue
+    const n = left.get(guess[i]) ?? 0
+    if (n > 0) {
+      states[i] = 'present'
+      left.set(guess[i], n - 1)
+    }
+  }
+
+  return states
+}
 
 export default function Login() {
   const { loginWith42 } = useAuth()
@@ -28,6 +51,8 @@ export default function Login() {
 
   const [value, setValue] = useState('')
   const [focused, setFocused] = useState(false)
+  const [states, setStates] = useState<LetterState[] | null>(null)
+  const [feedback, setFeedback] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
 
   const error = ERRORS[params.get('error') ?? '']
@@ -41,6 +66,27 @@ export default function Login() {
     [reducedMotion],
   )
 
+  function change(next: string) {
+    setValue(next.toLowerCase().replace(/[^a-z-]/g, '').slice(0, SIZE))
+    setStates(null)
+    setFeedback('')
+  }
+
+  function submit() {
+    if (value.length < SIZE) {
+      setFeedback('Remplis les huit cases pour essayer.')
+      return
+    }
+
+    const next = score(value, DEMO_SECRET)
+    setStates(next)
+    setFeedback(
+      value === DEMO_SECRET
+        ? 'Bien joué. Dans le vrai jeu, il reste à la faire signer.'
+        : 'Connecte-toi pour deviner une vraie cible.',
+    )
+  }
+
   return (
     <main className="login">
       <AnimatedGradient config={gradient} noise={{ opacity: 0.35 }} />
@@ -50,43 +96,54 @@ export default function Login() {
         <p className="login-brand">guess the swimmer</p>
 
         <div
-          className={`login-field ${focused ? 'is-focused' : ''}`}
+          className="login-field"
           onClick={() => inputRef.current?.focus()}
         >
           <input
             ref={inputRef}
             className="login-input"
             value={value}
-            onChange={(e) =>
-              setValue(
-                e.target.value
-                  .toLowerCase()
-                  .replace(/[^a-z-]/g, '')
-                  .slice(0, SIZE),
-              )
-            }
+            onChange={(e) => change(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault()
+                submit()
+              }
+            }}
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
             maxLength={SIZE}
             spellCheck={false}
             autoComplete="off"
-            aria-label="Essaie un login de ta piscine"
+            aria-label="Essaie un mot pour voir les couleurs"
           />
 
           <div className="login-slots" aria-hidden="true">
-            {Array.from({ length: SIZE }, (_, i) => (
-              <span
-                key={i}
-                className={`login-slot ${value[i] ? 'is-filled' : ''} ${
-                  focused && i === value.length ? 'is-active' : ''
-                }`}
-                style={{ animationDelay: `${0.12 + i * 0.045}s` }}
-              >
-                {value[i] ?? '?'}
-              </span>
-            ))}
+            {Array.from({ length: SIZE }, (_, i) => {
+              const active = focused && !states && i === value.length
+              return (
+                <span
+                  key={i}
+                  className={[
+                    'login-slot',
+                    value[i] ? 'is-filled' : '',
+                    active ? 'is-active' : '',
+                    states ? states[i] : '',
+                  ]
+                    .filter(Boolean)
+                    .join(' ')}
+                  style={{ animationDelay: `${0.12 + i * 0.045}s` }}
+                >
+                  {value[i] ?? (active ? '' : '?')}
+                </span>
+              )
+            })}
           </div>
         </div>
+
+        <p className="login-feedback mono" aria-live="polite">
+          {feedback || 'Tape un mot puis Entrée pour voir les couleurs.'}
+        </p>
 
         <h1 className="login-title">
           Découvre les gens
@@ -95,8 +152,9 @@ export default function Login() {
         </h1>
 
         <p className="login-lead">
-          Chaque jour, un login à deviner en huit caractères. Puis il faut aller
-          trouver la personne derrière pour qu’elle valide.
+          Chaque jour, le login d’un autre piscineux à deviner. Deviner ne
+          suffit pas : il faut aller lui parler pour qu’il valide. En un mois,
+          tu les auras tous rencontrés.
         </p>
 
         <div className="login-alert-slot" aria-live="polite">

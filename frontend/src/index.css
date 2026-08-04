@@ -643,7 +643,7 @@ body {
 
 .login-field {
   position: relative;
-  margin: 44px 0 40px;
+  margin: 44px 0 0;
   cursor: text;
 }
 
@@ -694,6 +694,21 @@ body {
 .login-slot.is-active {
   border-bottom-color: var(--sky);
 }
+
+.login-slot.correct {
+  color: #fff;
+  border-bottom-color: var(--correct);
+  background: linear-gradient(to top, rgba(31, 157, 85, 0.28), transparent 70%);
+}
+.login-slot.present {
+  color: #fff;
+  border-bottom-color: var(--present);
+  background: linear-gradient(to top, rgba(201, 162, 39, 0.28), transparent 70%);
+}
+.login-slot.absent {
+  color: rgba(232, 237, 242, 0.5);
+  border-bottom-color: rgba(255, 255, 255, 0.16);
+}
 .login-slot.is-active::after {
   content: '';
   position: absolute;
@@ -717,6 +732,15 @@ body {
     opacity: 0;
     transform: translateY(10px);
   }
+}
+
+.login-feedback {
+  margin: 18px 0 34px;
+  min-height: 16px;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: rgba(107, 125, 146, 0.85);
+  animation: pool-fade 0.7s ease 0.35s both;
 }
 
 .login-title {
@@ -869,6 +893,7 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .login-brand,
   .login-slot,
+  .login-feedback,
   .login-title,
   .login-lead,
   .login-cta,
@@ -882,7 +907,7 @@ body {
 
 @media (max-width: 420px) {
   .login-field {
-    margin: 34px 0 32px;
+    margin: 34px 0 0;
   }
   .login-meta {
     letter-spacing: 0.08em;
