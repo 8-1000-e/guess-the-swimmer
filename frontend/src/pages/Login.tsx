@@ -5,7 +5,6 @@ const ERRORS: Record<string, string> = {
   invalid_state: 'Session OAuth invalide, réessaie.',
   ft_auth_failed: 'La connexion avec 42 a échoué.',
   not_in_pool: "Ton login n'est pas dans la piscine d'août 2026.",
-  account_disabled: 'Ton compte a été désactivé.',
 }
 
 export default function Login() {
