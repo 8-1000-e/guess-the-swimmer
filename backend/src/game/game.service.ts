@@ -285,18 +285,20 @@ export class GameService
         });
         if (!user) throw new NotFoundException('Unknown player');
 
-        const validated = user.rounds.filter(r => r.status === 'validated');
-
         return {
             login: user.login,
             name: user.name,
             ftPfpUrl: user.ftPfpUrl,
             campus: user.campus,
             createdAt: user.createdAt,
-            validated: validated.length,
+            validated: user.rounds.filter(r => r.status === 'validated').length,
+            found: user.rounds.filter(r => r.status === 'solved' || r.status === 'validated').length,
             attempts: user.rounds.reduce((sum, r) => sum + r.attempts, 0),
             played: user.rounds.length,
-            rounds: user.rounds,
+            rounds: user.rounds.map(r => ({
+                ...r,
+                targetLogin: r.status === 'playing' ? null : r.targetLogin,
+            })),
         };
     }
 
@@ -311,10 +313,11 @@ export class GameService
                 login: u.login,
                 ftPfpUrl: u.ftPfpUrl,
                 validated: u.rounds.filter(r => r.status === 'validated').length,
+                found: u.rounds.filter(r => r.status === 'solved' || r.status === 'validated').length,
                 attempts: u.rounds.reduce((sum, r) => sum + r.attempts, 0),
                 played: u.rounds.length,
             }))
-            .sort((a, b) => b.validated - a.validated || a.attempts - b.attempts)
+            .sort((a, b) => b.validated - a.validated || b.found - a.found || a.attempts - b.attempts)
             .map((row, i) => ({rank: i + 1, ...row}));
     }
 }
