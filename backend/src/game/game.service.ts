@@ -106,18 +106,34 @@ export class GameService
         });
         
         const targets = potentialTargets.map(r => r.login);
+        if (targets.length === 0)
+            throw new BadRequestException('No target left');
+
         const target = targets[Math.floor(Math.random() * targets.length)];
 
-        await this.prisma.round.create({
-            data:
-            {
-                playerId: user.ftId,
-                targetLogin: target,
-                assignedOn: this.today(),
-            }
-        });
+        try
+        {
+            await this.prisma.round.create({
+                data:
+                {
+                    playerId: user.ftId,
+                    targetLogin: target,
+                    assignedOn: this.today(),
+                }
+            });
+            return {length: target.length, guesses: [] };
+        }
+        catch (e)
+        {
+            if ((e as {code?: string}).code !== 'P2002')
+                throw e;
 
-        return {length: target.length, guesses: [] };
+            const raced = await this.prisma.round.findUnique({
+                where: {playerId_assignedOn: {playerId: ftId, assignedOn: this.today()}},
+                include: {guesses: {orderBy: {createdAt: 'asc'}}},
+            });
+            return {length: raced!.targetLogin.length, guesses: raced!.guesses};
+        }
     }
 
     async guess(ftId: string, value: string)
@@ -252,11 +268,16 @@ export class GameService
                 validatedAt: new Date(),
                 signToken: null,
                 signTokenExpiresAt: null,
-                attempts: Math.max(0, round.attempts - bonus),
+                attempts: {decrement: bonus},
             }
         });
         if (count === 0)
             throw new BadRequestException('Round already validated');
+
+        await this.prisma.round.updateMany({
+            where: {id: round.id, attempts: {lt: 0}},
+            data: {attempts: 0},
+        });
 
         const player = await this.prisma.user.findUnique({
             where: {ftId: round.playerId},

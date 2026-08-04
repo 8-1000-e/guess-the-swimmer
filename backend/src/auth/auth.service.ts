@@ -100,9 +100,9 @@ export class AuthService {
     return this.issueTokens(user.ftId, user.login);
   }
 
-  async logout(refreshToken: string) {
+  async logout(ftId: string, refreshToken: string) {
     await this.prisma.refreshToken.deleteMany({
-      where: { tokenHash: this.hash(refreshToken) },
+      where: { ftId, tokenHash: this.hash(refreshToken) },
     });
     return { message: 'Logged out' };
   }

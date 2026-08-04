@@ -69,8 +69,8 @@ export class AuthController {
 
   @Post('logout')
   @UseGuards(JwtAuthGuard)
-  logout(@Body() body: TokenDto) {
-    return this.auth.logout(body.refresh_token);
+  logout(@Req() req: AuthedRequest, @Body() body: TokenDto) {
+    return this.auth.logout(req.user.sub, body.refresh_token);
   }
 
   @Get('me')
