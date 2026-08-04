@@ -1,12 +1,12 @@
 import { useEffect } from 'react'
+import AppShell from '@/components/AppShell'
 import Board from '@/components/Board'
 import Keyboard from '@/components/Keyboard'
+import QrPanel from '@/components/QrPanel'
 import TargetList from '@/components/TargetList'
 import { useGame } from '@/game/useGame'
-import { useAuth } from '@/auth/useAuth'
 
 export default function Game() {
-  const { user, logout } = useAuth()
   const game = useGame()
 
   useEffect(() => {
@@ -21,22 +21,7 @@ export default function Game() {
   }, [game])
 
   return (
-    <div className="app">
-      <header className="topbar">
-        <h1 className="logo">
-          Guess the <span className="accent">Swimmer</span>
-        </h1>
-        <div className="topbar-right">
-          {user?.ftPfpUrl && (
-            <img className="avatar" src={user.ftPfpUrl} alt="" />
-          )}
-          <span className="mono">{user?.login}</span>
-          <button type="button" className="btn-ghost" onClick={() => logout()}>
-            Déconnexion
-          </button>
-        </div>
-      </header>
-
+    <AppShell>
       <div className="layout">
         <main className="game">
           {game.loading ? (
@@ -54,13 +39,17 @@ export default function Game() {
                 solved={game.solved}
               />
 
-              <Keyboard
-                keys={game.keys}
-                onKey={game.type}
-                onEnter={() => void game.submit()}
-                onBackspace={game.backspace}
-                disabled={game.solved || game.submitting}
-              />
+              {game.solved ? (
+                <QrPanel />
+              ) : (
+                <Keyboard
+                  keys={game.keys}
+                  onKey={game.type}
+                  onEnter={() => void game.submit()}
+                  onBackspace={game.backspace}
+                  disabled={game.submitting}
+                />
+              )}
 
               <p className="hint mono">
                 {game.length} lettres · {game.rows.length} essai
@@ -72,6 +61,6 @@ export default function Game() {
 
         {!game.loading && <TargetList targets={game.targets} />}
       </div>
-    </div>
+    </AppShell>
   )
 }

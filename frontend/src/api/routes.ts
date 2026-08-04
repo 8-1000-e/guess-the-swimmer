@@ -17,6 +17,10 @@ export const ROUTES = {
     round: '/game/round',
     guess: '/game/guess',
     targets: '/game/targets',
+    qr: '/game/qr',
+    sign: '/game/sign',
+    leaderboard: '/game/leaderboard',
+    user: (login: string) => `/game/users/${login}`,
   },
 } as const
 

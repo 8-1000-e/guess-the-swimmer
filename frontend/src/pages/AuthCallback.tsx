@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/auth/useAuth'
 import { tokenStore } from '@/auth/tokenStore'
+import { PENDING_SIGN_KEY } from './Sign'
 
 export default function AuthCallback() {
   const { setTokens, fetchMe } = useAuth()
@@ -25,8 +26,13 @@ export default function AuthCallback() {
     setTokens({ access_token, refresh_token })
     history.replaceState(null, '', window.location.pathname)
 
+    const pendingSign = sessionStorage.getItem(PENDING_SIGN_KEY)
+    sessionStorage.removeItem(PENDING_SIGN_KEY)
+
     fetchMe()
-      .then(() => navigate('/', { replace: true }))
+      .then(() =>
+        navigate(pendingSign ? `/sign/${pendingSign}` : '/', { replace: true }),
+      )
       .catch(() => {
         tokenStore.clear()
         navigate('/login?error=ft_auth_failed', { replace: true })
