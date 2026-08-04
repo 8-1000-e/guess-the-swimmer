@@ -53,7 +53,9 @@ export default function Login() {
   const [focused, setFocused] = useState(false)
   const [states, setStates] = useState<LetterState[] | null>(null)
   const [feedback, setFeedback] = useState('')
+  const [fading, setFading] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
+  const timers = useRef<number[]>([])
 
   const error = ERRORS[params.get('error') ?? '']
 
@@ -61,12 +63,28 @@ export default function Login() {
     inputRef.current?.focus()
   }, [])
 
+  useEffect(() => () => timers.current.forEach(clearTimeout), [])
+
+  function clearTimers() {
+    timers.current.forEach(clearTimeout)
+    timers.current = []
+  }
+
+  function reset() {
+    setValue('')
+    setStates(null)
+    setFeedback('')
+    setFading(false)
+  }
+
   const gradient = useMemo(
     () => ({ preset: 'Prism' as const, speed: reducedMotion ? 0 : 18 }),
     [reducedMotion],
   )
 
   function change(next: string) {
+    clearTimers()
+    setFading(false)
     setValue(next.toLowerCase().replace(/[^a-z-]/g, '').slice(0, SIZE))
     setStates(null)
     setFeedback('')
@@ -78,13 +96,21 @@ export default function Login() {
       return
     }
 
-    const next = score(value, DEMO_SECRET)
-    setStates(next)
+    clearTimers()
+    setStates(score(value, DEMO_SECRET))
     setFeedback(
       value === DEMO_SECRET
         ? 'Bien joué. Dans le vrai jeu, il reste à la faire signer.'
         : 'Connecte-toi pour deviner une vraie cible.',
     )
+
+    if (reducedMotion) {
+      timers.current.push(window.setTimeout(reset, 6000))
+      return
+    }
+
+    timers.current.push(window.setTimeout(() => setFading(true), 6000))
+    timers.current.push(window.setTimeout(reset, 6700))
   }
 
   return (
@@ -96,7 +122,7 @@ export default function Login() {
         <p className="login-brand">guess the swimmer</p>
 
         <div
-          className="login-field"
+          className={`login-field ${fading ? 'is-fading' : ''}`}
           onClick={() => inputRef.current?.focus()}
         >
           <input
