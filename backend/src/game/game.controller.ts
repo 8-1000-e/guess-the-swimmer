@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import type { AuthedRequest } from '../auth/authed-request';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { GuessDto } from './dto/guess.dto';
@@ -23,6 +31,11 @@ export class GameController {
   @Post('guess')
   guess(@Req() req: AuthedRequest, @Body() body: GuessDto) {
     return this.game.guess(req.user.sub, body.value);
+  }
+
+  @Get('users/:login')
+  userStats(@Param('login') login: string) {
+    return this.game.userStats(login.toLowerCase());
   }
 
   @Get('leaderboard')

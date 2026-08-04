@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { PrismaService } from "src/prisma/prisma.service";
 import { UnauthorizedException } from "@nestjs/common";
@@ -264,6 +264,40 @@ export class GameService
         });
 
         return {validated: true, player, bonus};
+    }
+
+    async userStats(login: string)
+    {
+        const user = await this.prisma.user.findUnique({
+            where: {login},
+            include: {
+                rounds: {
+                    orderBy: {assignedOn: 'desc'},
+                    select: {
+                        targetLogin: true,
+                        status: true,
+                        attempts: true,
+                        assignedOn: true,
+                        validatedAt: true,
+                    },
+                },
+            },
+        });
+        if (!user) throw new NotFoundException('Unknown player');
+
+        const validated = user.rounds.filter(r => r.status === 'validated');
+
+        return {
+            login: user.login,
+            name: user.name,
+            ftPfpUrl: user.ftPfpUrl,
+            campus: user.campus,
+            createdAt: user.createdAt,
+            validated: validated.length,
+            attempts: user.rounds.reduce((sum, r) => sum + r.attempts, 0),
+            played: user.rounds.length,
+            rounds: user.rounds,
+        };
     }
 
     async leaderboard()
