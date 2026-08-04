@@ -2,6 +2,8 @@ import { BadRequestException, Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { PrismaService } from "src/prisma/prisma.service";
 import { UnauthorizedException } from "@nestjs/common";
+import { Cron } from "@nestjs/schedule";
+import { randomBytes } from "crypto";
 
 type LetterState = 'correct' | 'present' | 'absent';
 
@@ -9,6 +11,7 @@ type LetterResult = {
     letter: string;
     state: LetterState;
 };
+
 
 @Injectable()
 export class GameService
@@ -18,6 +21,8 @@ export class GameService
         private readonly config: ConfigService,
     )
     {}
+    
+
 
     private today(): Date
     {
@@ -29,6 +34,17 @@ export class GameService
         const get = (type: string) => parts.find(p => p.type === type)!.value;
 
         return new Date(`${get('year')}-${get('month')}-${get('day')}T00:00:00Z`);
+    }
+
+    @Cron('0 0 * * *', { timeZone: 'Europe/Paris' })
+    async expireRounds() 
+    {
+        await this.prisma.round.updateMany({
+            where: {status: {in: ["playing", "solved"]}, assignedOn: {lt: this.today() }},
+            data: {
+                status: 'expired'
+            }
+        });
     }
 
     private scoreGuess(value: string, target: string): LetterResult[]
@@ -183,24 +199,89 @@ export class GameService
         }));
     }
 
-    getQrToken(ftId: string, roundId: string)
+    async getQrToken(ftId: string)
     {
+        const user = await this.prisma.user.findUnique({where: {ftId}});
+        if (!user) throw new UnauthorizedException();
 
+        const round = await this.prisma.round.findUnique({
+            where: {playerId_assignedOn: { playerId: ftId, assignedOn: this.today()}},
+        });
+        if (!round)
+            throw new BadRequestException();
+        if (round.status !== 'solved')
+            throw new BadRequestException('Target still not found');
+        const token = randomBytes(16).toString('hex');
+        const expiresAt = new Date(Date.now() + this.config.get<number>('SIGN_TOKEN_TTL', 60) * 1000)
+
+        await this.prisma.round.update({
+            where: {id: round.id},
+            data: {
+                signToken: token,
+                signTokenExpiresAt: expiresAt,
+            }
+        })
+        return {token, expiresAt};
     }
 
-    sign(scannerFtId: string, token: string)
+    async sign(scannerFtId: string, token: string)
     {
+        const scanner = await this.prisma.user.findUnique({where: {ftId: scannerFtId}});
+        if (!scanner) throw new UnauthorizedException();
 
+        const round = await this.prisma.round.findUnique({
+            where: {signToken: token},
+        });
+        if (!round)
+            throw new BadRequestException('Invalid token');
+        if (!round.signTokenExpiresAt || round.signTokenExpiresAt < new Date())
+            throw new BadRequestException('Token expired');
+        if (round.status !== 'solved')
+            throw new BadRequestException('Round already validated');
+        if (round.targetLogin !== scanner.login)
+            throw new BadRequestException('You are not the target');
+        if (round.playerId === scanner.ftId)
+            throw new BadRequestException('You cannot sign your own round');
+
+        const bonus = Number(this.config.get('SIGN_BONUS_ATTEMPTS') ?? 5);
+
+        const { count } = await this.prisma.round.updateMany({
+            where: {id: round.id, status: 'solved', signToken: token},
+            data: {
+                status: 'validated',
+                validatedAt: new Date(),
+                signToken: null,
+                signTokenExpiresAt: null,
+                attempts: Math.max(0, round.attempts - bonus),
+            }
+        });
+        if (count === 0)
+            throw new BadRequestException('Round already validated');
+
+        const player = await this.prisma.user.findUnique({
+            where: {ftId: round.playerId},
+            select: {login: true, name: true},
+        });
+
+        return {validated: true, player, bonus};
     }
 
-    pending(ftId: string)
+    async leaderboard()
     {
+        const users = await this.prisma.user.findMany({
+            include: {rounds: {select: {status: true, attempts: true}}},
+        });
 
-    }
-
-    leaderboard()
-    {
-
+        return users
+            .map(u => ({
+                login: u.login,
+                ftPfpUrl: u.ftPfpUrl,
+                validated: u.rounds.filter(r => r.status === 'validated').length,
+                attempts: u.rounds.reduce((sum, r) => sum + r.attempts, 0),
+                played: u.rounds.length,
+            }))
+            .sort((a, b) => b.validated - a.validated || a.attempts - b.attempts)
+            .map((row, i) => ({rank: i + 1, ...row}));
     }
 }
 

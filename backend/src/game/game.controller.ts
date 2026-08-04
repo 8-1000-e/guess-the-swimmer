@@ -2,6 +2,7 @@ import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import type { AuthedRequest } from '../auth/authed-request';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { GuessDto } from './dto/guess.dto';
+import { SignDto } from './dto/sign.dto';
 import { GameService } from './game.service';
 
 @Controller('game')
@@ -22,5 +23,20 @@ export class GameController {
   @Post('guess')
   guess(@Req() req: AuthedRequest, @Body() body: GuessDto) {
     return this.game.guess(req.user.sub, body.value);
+  }
+
+  @Get('leaderboard')
+  leaderboard() {
+    return this.game.leaderboard();
+  }
+
+  @Get('qr')
+  qr(@Req() req: AuthedRequest) {
+    return this.game.getQrToken(req.user.sub);
+  }
+
+  @Post('sign')
+  sign(@Req() req: AuthedRequest, @Body() body: SignDto) {
+    return this.game.sign(req.user.sub, body.token);
   }
 }
