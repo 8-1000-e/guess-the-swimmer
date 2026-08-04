@@ -26,7 +26,6 @@ model User {
   name     String
   ftPfpUrl String?
   campus   String?
-  active   Boolean @default(true)
 
   totalTryCount Int @default(0)
 

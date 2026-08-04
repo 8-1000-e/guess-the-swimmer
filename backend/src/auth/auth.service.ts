@@ -1,8 +1,4 @@
-import {
-  ForbiddenException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { createHash, randomBytes } from 'node:crypto';
@@ -11,7 +7,7 @@ import { PrismaService } from '../prisma/prisma.service';
 
 const REFRESH_TTL_DAYS = 7;
 
-export type FtAuthError = 'not_in_pool' | 'account_disabled';
+export type FtAuthError = 'not_in_pool';
 
 export class FtAuthRejection extends Error {
   constructor(readonly reason: FtAuthError) {
@@ -57,8 +53,6 @@ export class AuthService {
       create: { ftId, ...identity },
     });
 
-    if (!user.active) throw new FtAuthRejection('account_disabled');
-
     return this.issueTokens(user.ftId, user.login);
   }
 
@@ -102,7 +96,6 @@ export class AuthService {
       where: { ftId: stored.ftId },
     });
     if (!user) throw new UnauthorizedException();
-    if (!user.active) throw new ForbiddenException('account_disabled');
 
     return this.issueTokens(user.ftId, user.login);
   }
