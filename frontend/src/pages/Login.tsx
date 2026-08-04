@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useAuth } from '@/auth/useAuth'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
@@ -19,69 +19,84 @@ const ERRORS: Record<string, { title: string; hint: string }> = {
   },
 }
 
-const SLOTS = [0, 1, 2, 3, 4, 5, 6, 7]
+const SIZE = 8
 
 export default function Login() {
   const { loginWith42 } = useAuth()
   const [params] = useSearchParams()
   const reducedMotion = useReducedMotion()
 
+  const [value, setValue] = useState('')
+  const [focused, setFocused] = useState(false)
+  const inputRef = useRef<HTMLInputElement>(null)
+
   const error = ERRORS[params.get('error') ?? '']
 
+  useEffect(() => {
+    inputRef.current?.focus()
+  }, [])
+
   const gradient = useMemo(
-    () =>
-      ({
-        preset: 'custom',
-        color1: '#050A10',
-        color2: '#1B4B6B',
-        color3: '#7DE2D1',
-        rotation: -12,
-        proportion: 44,
-        scale: 0.34,
-        speed: reducedMotion ? 0 : 11,
-        distortion: 8,
-        swirl: 55,
-        swirlIterations: 8,
-        softness: 100,
-        offset: 0,
-        shape: 'Stripes',
-        shapeSize: 62,
-      }) as const,
+    () => ({ preset: 'Prism' as const, speed: reducedMotion ? 0 : 18 }),
     [reducedMotion],
   )
 
   return (
     <main className="login">
-      <AnimatedGradient config={gradient} noise={{ opacity: 0.3 }} />
-      <div className="login-depth" aria-hidden="true" />
+      <AnimatedGradient config={gradient} noise={{ opacity: 0.35 }} />
+      <div className="login-veil" aria-hidden="true" />
 
       <div className="login-col">
         <p className="login-brand">guess the swimmer</p>
 
-        <div className="login-hero">
+        <div
+          className={`login-field ${focused ? 'is-focused' : ''}`}
+          onClick={() => inputRef.current?.focus()}
+        >
+          <input
+            ref={inputRef}
+            className="login-input"
+            value={value}
+            onChange={(e) =>
+              setValue(
+                e.target.value
+                  .toLowerCase()
+                  .replace(/[^a-z-]/g, '')
+                  .slice(0, SIZE),
+              )
+            }
+            onFocus={() => setFocused(true)}
+            onBlur={() => setFocused(false)}
+            maxLength={SIZE}
+            spellCheck={false}
+            autoComplete="off"
+            aria-label="Essaie un login de ta piscine"
+          />
+
           <div className="login-slots" aria-hidden="true">
-            {SLOTS.map((i) => (
+            {Array.from({ length: SIZE }, (_, i) => (
               <span
                 key={i}
-                className="login-slot"
+                className={`login-slot ${value[i] ? 'is-filled' : ''} ${
+                  focused && i === value.length ? 'is-active' : ''
+                }`}
                 style={{ animationDelay: `${0.12 + i * 0.045}s` }}
               >
-                ?
+                {value[i] ?? '?'}
               </span>
             ))}
-            <span className="login-sweep" />
           </div>
         </div>
 
         <h1 className="login-title">
-          Huit caractères.
+          Découvre les gens
           <br />
-          <span className="login-title-dim">Une personne.</span>
+          <span className="login-title-accent">de ta piscine.</span>
         </h1>
 
         <p className="login-lead">
-          Chaque jour, un login de ta piscine à deviner — puis à retrouver en
-          vrai pour qu’elle valide ta trouvaille.
+          Chaque jour, un login à deviner en huit caractères. Puis il faut aller
+          trouver la personne derrière pour qu’elle valide.
         </p>
 
         <div className="login-alert-slot" aria-live="polite">
