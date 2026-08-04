@@ -110,7 +110,7 @@ export default function Login() {
     }
 
     timers.current.push(window.setTimeout(() => setFading(true), 2500))
-    timers.current.push(window.setTimeout(reset, 3700))
+    timers.current.push(window.setTimeout(reset, 3000))
   }
 
   return (
