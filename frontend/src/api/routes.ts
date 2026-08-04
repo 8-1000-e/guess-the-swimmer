@@ -14,11 +14,9 @@ export const ROUTES = {
   },
 
   game: {
-    daily: '/game/daily',
+    round: '/game/round',
     guess: '/game/guess',
-    history: '/game/history',
-    leaderboard: '/game/leaderboard',
-    swimmers: '/game/swimmers',
+    targets: '/game/targets',
   },
 } as const
 

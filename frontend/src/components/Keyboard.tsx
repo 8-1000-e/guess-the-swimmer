@@ -1,4 +1,4 @@
-import type { LetterState } from '@/game/engine'
+import type { LetterState } from '@/types/game'
 
 const ROWS = ['azertyuiop', 'qsdfghjklm', 'wxcvbn']
 
@@ -7,6 +7,7 @@ interface KeyboardProps {
   onKey: (letter: string) => void
   onEnter: () => void
   onBackspace: () => void
+  disabled?: boolean
 }
 
 export default function Keyboard({
@@ -14,13 +15,19 @@ export default function Keyboard({
   onKey,
   onEnter,
   onBackspace,
+  disabled,
 }: KeyboardProps) {
   return (
     <div className="keyboard">
       {ROWS.map((row, i) => (
         <div className="kb-row" key={i}>
           {i === 2 && (
-            <button type="button" className="key wide" onClick={onEnter}>
+            <button
+              type="button"
+              className="key wide"
+              onClick={onEnter}
+              disabled={disabled}
+            >
               Enter
             </button>
           )}
@@ -30,12 +37,18 @@ export default function Keyboard({
               key={letter}
               className={`key ${keys[letter] ?? ''}`}
               onClick={() => onKey(letter)}
+              disabled={disabled}
             >
               {letter}
             </button>
           ))}
           {i === 2 && (
-            <button type="button" className="key wide" onClick={onBackspace}>
+            <button
+              type="button"
+              className="key wide"
+              onClick={onBackspace}
+              disabled={disabled}
+            >
               ⌫
             </button>
           )}

@@ -1,14 +1,13 @@
-import { MAX_ATTEMPTS, type LetterResult } from '@/game/engine'
+import type { LetterResult } from '@/types/game'
 
 interface BoardProps {
   rows: LetterResult[][]
   current: string
   length: number
+  solved: boolean
 }
 
-export default function Board({ rows, current, length }: BoardProps) {
-  const empty = Math.max(0, MAX_ATTEMPTS - rows.length - 1)
-
+export default function Board({ rows, current, length, solved }: BoardProps) {
   return (
     <div className="board" style={{ '--cols': length } as React.CSSProperties}>
       {rows.map((row, i) => (
@@ -21,7 +20,7 @@ export default function Board({ rows, current, length }: BoardProps) {
         </div>
       ))}
 
-      {rows.length < MAX_ATTEMPTS && (
+      {!solved && (
         <div className="row">
           {Array.from({ length }, (_, j) => (
             <div className={`tile ${current[j] ? 'filled' : ''}`} key={j}>
@@ -30,14 +29,6 @@ export default function Board({ rows, current, length }: BoardProps) {
           ))}
         </div>
       )}
-
-      {Array.from({ length: empty }, (_, i) => (
-        <div className="row" key={`empty-${i}`}>
-          {Array.from({ length }, (_, j) => (
-            <div className="tile" key={j} />
-          ))}
-        </div>
-      ))}
     </div>
   )
 }

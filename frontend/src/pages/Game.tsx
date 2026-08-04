@@ -1,21 +1,18 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import Board from '@/components/Board'
 import Keyboard from '@/components/Keyboard'
-import { playableLengths } from '@/game/engine'
+import TargetList from '@/components/TargetList'
 import { useGame } from '@/game/useGame'
 import { useAuth } from '@/auth/useAuth'
 
-const LENGTHS = playableLengths()
-
 export default function Game() {
   const { user, logout } = useAuth()
-  const [length, setLength] = useState(LENGTHS[LENGTHS.length - 1] ?? 8)
-  const game = useGame(length)
+  const game = useGame()
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
       if (e.metaKey || e.ctrlKey || e.altKey) return
-      if (e.key === 'Enter') game.submit()
+      if (e.key === 'Enter') void game.submit()
       else if (e.key === 'Backspace') game.backspace()
       else if (/^[a-zA-Z-]$/.test(e.key)) game.type(e.key)
     }
@@ -40,39 +37,41 @@ export default function Game() {
         </div>
       </header>
 
-      <main className="game">
-        <div className="controls">
-          <span className="mono muted">Longueur</span>
-          {LENGTHS.map((n) => (
-            <button
-              type="button"
-              key={n}
-              className={`chip ${n === length ? 'chip-active' : ''}`}
-              onClick={() => setLength(n)}
-            >
-              {n}
-            </button>
-          ))}
-          <button type="button" className="btn-ghost" onClick={game.reset}>
-            Rejouer
-          </button>
-        </div>
+      <div className="layout">
+        <main className="game">
+          {game.loading ? (
+            <p className="hint mono">Chargement…</p>
+          ) : (
+            <>
+              <p className={`message ${game.solved ? 'won' : ''}`}>
+                {game.message || ' '}
+              </p>
 
-        <p className={`message ${game.status}`}>{game.message || ' '}</p>
+              <Board
+                rows={game.rows}
+                current={game.current}
+                length={game.length}
+                solved={game.solved}
+              />
 
-        <Board rows={game.rows} current={game.current} length={game.length} />
+              <Keyboard
+                keys={game.keys}
+                onKey={game.type}
+                onEnter={() => void game.submit()}
+                onBackspace={game.backspace}
+                disabled={game.solved || game.submitting}
+              />
 
-        <Keyboard
-          keys={game.keys}
-          onKey={game.type}
-          onEnter={game.submit}
-          onBackspace={game.backspace}
-        />
+              <p className="hint mono">
+                {game.length} lettres · {game.rows.length} essai
+                {game.rows.length > 1 ? 's' : ''}
+              </p>
+            </>
+          )}
+        </main>
 
-        <p className="hint mono">
-          {game.pool.length} logins de {length} lettres dans la piscine
-        </p>
-      </main>
+        {!game.loading && <TargetList targets={game.targets} />}
+      </div>
     </div>
   )
 }
