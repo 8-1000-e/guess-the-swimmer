@@ -15,9 +15,34 @@ const ERRORS: Record<string, { title: string; hint: string }> = {
   },
   not_in_pool: {
     title: 'Tu n’es pas dans la piscine',
-    hint: "Seuls les piscineux d'Angoulême du mois en cours peuvent jouer.",
+    hint: 'Seuls les piscineux d’Angoulême du mois en cours peuvent jouer.',
   },
 }
+
+const DEMO = [
+  { letter: 'p', state: 'correct' },
+  { letter: 'i', state: 'absent' },
+  { letter: 's', state: 'present' },
+  { letter: 'c', state: 'absent' },
+  { letter: 'i', state: 'correct' },
+  { letter: 'n', state: 'absent' },
+  { letter: 'e', state: 'correct' },
+]
+
+const STEPS = [
+  {
+    title: 'Une cible par jour',
+    text: 'Chaque matin, le login d’un autre piscineux à deviner.',
+  },
+  {
+    title: 'Va lui parler',
+    text: 'Trouver le login ne suffit pas. Il faut retrouver la personne derrière.',
+  },
+  {
+    title: 'Fais signer ton QR',
+    text: 'Elle le scanne avec son téléphone, ta cible est validée.',
+  },
+]
 
 export default function Login() {
   const { loginWith42 } = useAuth()
@@ -27,7 +52,7 @@ export default function Login() {
   const error = ERRORS[params.get('error') ?? '']
 
   const gradient = useMemo(
-    () => ({ preset: 'Prism' as const, speed: reducedMotion ? 0 : 18 }),
+    () => ({ preset: 'Prism' as const, speed: reducedMotion ? 0 : 16 }),
     [reducedMotion],
   )
 
@@ -37,25 +62,52 @@ export default function Login() {
       <div className="login-veil" aria-hidden="true" />
 
       <section className="login-card">
-        <div className="login-mark" aria-hidden="true">
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="none">
-            <path
-              d="M2 17c2.2 0 2.2-1.6 4.4-1.6S8.6 17 10.8 17s2.2-1.6 4.4-1.6S17.4 17 19.6 17c1.4 0 1.9-.6 2.4-1.1M2 12c2.2 0 2.2-1.6 4.4-1.6S8.6 12 10.8 12s2.2-1.6 4.4-1.6S17.4 12 19.6 12c1.4 0 1.9-.6 2.4-1.1"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-            />
-            <circle cx="16" cy="6" r="2.2" fill="currentColor" />
-          </svg>
-        </div>
+        <p className="login-eyebrow mono">Piscine août 2026 · Angoulême</p>
 
         <h1 className="login-title">
-          Guess the <span className="accent">Swimmer</span>
+          Apprends à connaître
+          <br />
+          <span className="accent">ta piscine.</span>
         </h1>
-        <p className="login-sub">
-          Une cible par jour. Trouve son login, puis fais-lui signer ton QR code
-          en vrai pour valider.
+
+        <p className="login-lead">
+          Vous êtes 41 et vous ne vous connaissez pas encore. Ce jeu vous force
+          à vous parler : impossible de marquer un point sans aller voir
+          quelqu’un en vrai.
         </p>
+
+        <div className="login-demo" aria-hidden="true">
+          {DEMO.map((c, i) => (
+            <span
+              key={i}
+              className={`login-tile ${c.state}`}
+              style={{ animationDelay: `${0.35 + i * 0.06}s` }}
+            >
+              {c.letter}
+            </span>
+          ))}
+        </div>
+        <p className="login-legend mono">
+          <span className="sw correct" /> bien placé
+          <span className="sw present" /> ailleurs
+          <span className="sw absent" /> absent
+        </p>
+
+        <ol className="login-steps">
+          {STEPS.map((s, i) => (
+            <li
+              key={s.title}
+              className="login-step"
+              style={{ animationDelay: `${0.5 + i * 0.09}s` }}
+            >
+              <span className="login-step-num mono">{i + 1}</span>
+              <span className="login-step-body">
+                <strong>{s.title}</strong>
+                <span>{s.text}</span>
+              </span>
+            </li>
+          ))}
+        </ol>
 
         <div className="login-alert-slot" aria-live="polite">
           {error && (
@@ -72,7 +124,7 @@ export default function Login() {
         </button>
 
         <p className="login-foot">
-          Piscine d’août 2026 · campus d’Angoulême
+          Ton login intra doit être dans la piscine du mois.
         </p>
       </section>
     </main>
