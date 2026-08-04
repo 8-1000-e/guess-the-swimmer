@@ -728,9 +728,9 @@ body {
   content: '';
   position: absolute;
   left: 50%;
-  bottom: 8px;
+  top: 0.06em;
   width: 2px;
-  height: 0.72em;
+  height: 0.82em;
   transform: translateX(-50%);
   background: var(--sky);
   animation: caret 1.1s steps(1) infinite;

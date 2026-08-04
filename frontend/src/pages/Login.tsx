@@ -168,7 +168,7 @@ export default function Login() {
         </div>
 
         <p className="login-feedback mono" aria-live="polite">
-          {feedback || 'Tape un mot puis Entrée pour voir les couleurs.'}
+          {feedback || 'Tape un login puis Entrée pour voir les couleurs.'}
         </p>
 
         <h1 className="login-title">
