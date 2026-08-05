@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom'
 import AppShell from '@/components/AppShell'
 import Surface from '@/components/ui/Surface'
 import { api } from '@/api/client'
-import { useToast } from '@/toast/useToast'
 import { ROUTES } from '@/api/routes'
 import type { Round } from '@/types/game'
 
@@ -33,12 +32,11 @@ const STEPS = [
 const RULES = [
   'À minuit, heure de Paris, la manche du jour se termine, trouvée ou non.',
   'Une cible signée ne retombe jamais. Une cible non signée, si.',
-  'Le staff et les anciens élèves jouent aussi, et peuvent te tomber comme cible.',
+  'Le staff joue aussi, et peuvent te tomber comme cible.',
   'Une capture d’écran du QR ne sert à rien : le code change toutes les 30 secondes et c’est le compte du scanneur qui compte.',
 ]
 
 export default function HowItWorks() {
-  const { push } = useToast()
   const [bonus, setBonus] = useState<number | null>(null)
 
   useEffect(() => {
@@ -115,59 +113,6 @@ export default function HowItWorks() {
             <li key={r}>{r}</li>
           ))}
         </Surface>
-
-        {import.meta.env.DEV && (
-          <>
-            <h2 className="section-title">Notifications (dev)</h2>
-            <Surface className="how-colors">
-              <p className="how-text">
-                Aperçu des toasts, visible uniquement en développement.
-              </p>
-              <div className="how-buttons">
-                <button
-                  type="button"
-                  className="btn-glass"
-                  onClick={() =>
-                    push('error', 'Ce login n’existe pas', 'Vérifie ta saisie.')
-                  }
-                >
-                  Erreur
-                </button>
-                <button
-                  type="button"
-                  className="btn-glass"
-                  onClick={() =>
-                    push('success', 'Trouvé !', 'Reste à la faire signer.')
-                  }
-                >
-                  Succès
-                </button>
-                <button
-                  type="button"
-                  className="btn-glass"
-                  onClick={() =>
-                    push('info', 'Nouvelle cible', 'Une manche par jour.')
-                  }
-                >
-                  Info
-                </button>
-                <button
-                  type="button"
-                  className="btn-glass"
-                  onClick={() =>
-                    push(
-                      'error',
-                      'Serveur injoignable',
-                      'Vérifie que le back tourne sur le port 3000.',
-                    )
-                  }
-                >
-                  Réseau
-                </button>
-              </div>
-            </Surface>
-          </>
-        )}
 
         <p className="how-cta">
           <Link to="/" className="btn-glass">

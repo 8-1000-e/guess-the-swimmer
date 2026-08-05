@@ -654,13 +654,6 @@ body {
   color: var(--paper);
 }
 
-.how-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 14px;
-}
-
 @media (max-width: 620px) {
   .toaster {
     right: 12px;
