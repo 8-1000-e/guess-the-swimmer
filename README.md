@@ -36,8 +36,7 @@ refresh tokens tournants.
 
 La whitelist des joueurs n'est pas un fichier : `PoolService` interroge l'API 42
 au démarrage pour récupérer la piscine du mois en cours sur le campus configuré,
-avec les noms et les portraits. Les logins de `EXTRA_LOGINS` (staff, anciens
-élèves) sont ajoutés en plus. Un login absent de cette table ne peut pas se
+avec les noms et les portraits. Les logins de `EXTRA_LOGINS` (staff, tuteur) sont ajoutés en plus. Un login absent de cette table ne peut pas se
 connecter, et la contrainte est portée par la base : `User.login` est une clé
 étrangère vers `Swimmer.login`.
 
