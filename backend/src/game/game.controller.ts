@@ -33,6 +33,11 @@ export class GameController {
     return this.game.guess(req.user.sub, body.value);
   }
 
+  @Get('roster')
+  roster(@Req() req: AuthedRequest) {
+    return this.game.roster(req.user.sub);
+  }
+
   @Get('users/:login')
   userStats(@Param('login') login: string) {
     return this.game.userStats(login.toLowerCase());

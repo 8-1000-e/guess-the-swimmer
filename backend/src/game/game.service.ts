@@ -287,6 +287,37 @@ export class GameService
         return {validated: true, player, bonus};
     }
 
+    async roster(ftId: string)
+    {
+        const user = await this.prisma.user.findUnique({where: {ftId}});
+        if (!user) throw new UnauthorizedException();
+
+        const rounds = await this.prisma.round.findMany({
+            where: {playerId: ftId, status: 'validated'},
+            select: {targetLogin: true},
+        });
+        const met = new Set(rounds.map(r => r.targetLogin));
+
+        const swimmers = await this.prisma.swimmer.findMany({
+            select: {
+                login: true,
+                displayName: true,
+                ftPfpUrl: true,
+                staff: true,
+            },
+            orderBy: [{staff: 'asc'}, {login: 'asc'}],
+        });
+
+        return swimmers.map(s => ({
+            login: s.login,
+            displayName: s.displayName,
+            ftPfpUrl: s.ftPfpUrl,
+            staff: s.staff,
+            me: s.login === user.login,
+            met: met.has(s.login),
+        }));
+    }
+
     async userStats(login: string)
     {
         const user = await this.prisma.user.findUnique({

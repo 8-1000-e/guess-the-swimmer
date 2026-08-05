@@ -6,6 +6,8 @@ import { PrismaService } from '../prisma/prisma.service';
 interface FtCampusUser {
   id: number;
   login: string;
+  displayname?: string;
+  image?: { link: string | null; versions?: { medium?: string | null } };
 }
 
 const PAGE_SIZE = 100;
@@ -56,11 +58,40 @@ export class PoolService implements OnModuleInit {
       .filter(Boolean);
   }
 
+  private identityOf(u: FtCampusUser) {
+    return {
+      ftId: String(u.id),
+      displayName: u.displayname ?? null,
+      ftPfpUrl: u.image?.versions?.medium ?? u.image?.link ?? null,
+    };
+  }
+
+  private async syncStaff(logins: string[], now: Date) {
+    for (const login of logins) {
+      let identity: ReturnType<typeof this.identityOf> | null = null;
+      try {
+        identity = this.identityOf(
+          await this.ft.get<FtCampusUser>(`/v2/users/${login}`),
+        );
+      } catch {
+        this.logger.warn(`profil 42 introuvable pour ${login}`);
+      }
+
+      await this.prisma.swimmer.upsert({
+        where: { login },
+        update: { ...(identity ?? {}), staff: true, syncedAt: now },
+        create: { login, ...(identity ?? {}), staff: true },
+      });
+    }
+
+    return logins.length;
+  }
+
   async sync() {
     const campusId = this.config.get<string>('FT_CAMPUS_ID') ?? '31';
     const { month, year } = this.currentPool();
 
-    const logins: string[] = [];
+    const found = new Map<string, FtCampusUser>();
     for (let page = 1; ; page++) {
       const batch = await this.ft.get<FtCampusUser[]>(
         `/v2/campus/${campusId}/users` +
@@ -68,30 +99,37 @@ export class PoolService implements OnModuleInit {
           `&page[size]=${PAGE_SIZE}&page[number]=${page}`,
       );
 
-      logins.push(...batch.map((u) => u.login.trim().toLowerCase()));
+      for (const u of batch) found.set(u.login.trim().toLowerCase(), u);
       if (batch.length < PAGE_SIZE) break;
     }
 
-    const swimmers = [...new Set(logins)];
-    const staff = this.extraLogins().filter((l) => !swimmers.includes(l));
+    const swimmers = [...found.keys()];
+    const staffLogins = this.extraLogins().filter((l) => !found.has(l));
 
     const now = new Date();
 
-    for (const login of swimmers) {
+    for (const [login, u] of found) {
+      const identity = this.identityOf(u);
       await this.prisma.swimmer.upsert({
         where: { login },
-        update: { poolMonth: month, poolYear: year, staff: false, syncedAt: now },
-        create: { login, poolMonth: month, poolYear: year, staff: false },
+        update: {
+          ...identity,
+          poolMonth: month,
+          poolYear: year,
+          staff: false,
+          syncedAt: now,
+        },
+        create: {
+          login,
+          ...identity,
+          poolMonth: month,
+          poolYear: year,
+          staff: false,
+        },
       });
     }
 
-    for (const login of staff) {
-      await this.prisma.swimmer.upsert({
-        where: { login },
-        update: { staff: true, syncedAt: now },
-        create: { login, staff: true },
-      });
-    }
+    const staff = await this.syncStaff(staffLogins, now);
 
     const stale = await this.prisma.swimmer.findMany({
       where: { syncedAt: { lt: now }, staff: false },
@@ -99,13 +137,13 @@ export class PoolService implements OnModuleInit {
     });
 
     this.logger.log(
-      `piscine ${month} ${year} campus ${campusId}: ${swimmers.length} piscineux, ${staff.length} hors-piscine`,
+      `piscine ${month} ${year} campus ${campusId}: ${swimmers.length} piscineux, ${staff} hors-piscine`,
     );
     if (stale.length)
       this.logger.warn(
         `${stale.length} login(s) en base absents de l'API: ${stale.map((s) => s.login).join(', ')}`,
       );
 
-    return { swimmers: swimmers.length, staff: staff.length, stale: stale.length };
+    return { swimmers: swimmers.length, staff, stale: stale.length };
   }
 }
