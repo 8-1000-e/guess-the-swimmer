@@ -25,52 +25,76 @@ export default function QrPanel({ target }: { target: TargetIdentity | null }) {
     return () => clearInterval(id)
   }, [refresh])
 
+  const name = target?.displayName?.split(' ')[0] ?? target?.login ?? 'la cible'
+  const online = Boolean(target?.location)
+
   return (
     <Surface as="section" className="qr-card">
-      <div className="qr-side">
-        <p className="qr-step mono">Reste à la faire signer</p>
+      <ol className="steps">
+        <li className="step done">
+          <span className="step-mark" aria-hidden="true">
+            ✓
+          </span>
+          Login trouvé
+        </li>
+        <li className="step-line" aria-hidden="true" />
+        <li className="step now">
+          <span className="step-mark">2</span>
+          Rencontre en vrai
+        </li>
+      </ol>
 
+      <div className="qr-body">
         <div className="qr-who">
-          {target?.ftPfpUrl ? (
-            <img className="qr-face" src={target.ftPfpUrl} alt="" />
-          ) : (
-            <span className="qr-face qr-face-empty" aria-hidden="true" />
-          )}
-          <div className="qr-who-text">
+          <span className={`qr-portrait ${online ? 'online' : ''}`}>
+            {target?.ftPfpUrl ? (
+              <img src={target.ftPfpUrl} alt="" />
+            ) : (
+              <span className="qr-portrait-empty" aria-hidden="true" />
+            )}
+            <span className="qr-dot" aria-hidden="true" />
+          </span>
+
+          <div className="qr-id">
             <p className="qr-name">{target?.displayName ?? target?.login}</p>
             <p className="qr-login mono">{target?.login}</p>
+            <p className={`qr-where mono ${online ? 'on' : 'off'}`}>
+              {online ? `en cluster · poste ${target?.location}` : 'hors ligne'}
+            </p>
           </div>
         </div>
 
-        {target && (
-          <p className={`qr-where mono ${target.location ? 'on' : 'off'}`}>
-            <span className="pulse" aria-hidden="true" />
-            {target.location ? `poste ${target.location}` : 'hors ligne'}
-          </p>
-        )}
+        <p className="qr-why">
+          Deviner le login ne rapporte rien tant que <strong>{name}</strong> ne
+          l’a pas confirmé. Va le voir et fais-lui scanner ce code : c’est sa
+          signature qui valide la rencontre.
+        </p>
 
-        <p className="qr-lead">
-          {target?.location
-            ? 'Elle est en cluster en ce moment. Va la voir et fais-lui scanner le code.'
-            : 'Elle n’est sur aucun poste. Garde le code sous la main pour quand tu la croiseras.'}
+        <p className="qr-tip mono">
+          {online
+            ? `Poste ${target?.location} · il y est en ce moment`
+            : 'Personne en cluster · garde le code pour plus tard'}
         </p>
       </div>
 
-      <div className="qr-side qr-side-code">
+      <div className="qr-code">
         <div className="qr-frame">
           {error ? (
             <p className="qr-fallback">{error}</p>
           ) : qr ? (
             <QRCodeSVG
               value={`${window.location.origin}/sign/${qr.token}`}
-              size={172}
+              size={168}
               level="M"
             />
           ) : (
             <span className="qr-skeleton" />
           )}
         </div>
-        <p className="hint">Le code tourne toutes les 30 s</p>
+        <p className="qr-caption">
+          À scanner par <strong>{name}</strong>
+        </p>
+        <p className="hint">Nouveau code toutes les 30 s</p>
       </div>
     </Surface>
   )
