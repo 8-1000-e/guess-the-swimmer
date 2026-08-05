@@ -14,9 +14,27 @@ export interface Guess {
   createdAt: string
 }
 
+export interface TargetIdentity {
+  login: string
+  displayName: string | null
+  ftPfpUrl: string | null
+  location: string | null
+}
+
 export interface Round {
   length: number
   guesses: Guess[]
+  status: RoundStatus
+  attempts: number
+  target: TargetIdentity | null
+}
+
+export interface NeverPlayed {
+  code: 'NEVER_PLAYED'
+  login: string
+  displayName: string | null
+  ftPfpUrl: string | null
+  staff: boolean
 }
 
 export interface GuessResponse {

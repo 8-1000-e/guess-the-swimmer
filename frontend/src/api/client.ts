@@ -15,9 +15,14 @@ function buildError(statusCode: number, payload: unknown): ApiError {
   let message = 'Something went wrong'
   if (payload && typeof payload === 'object' && 'message' in payload) {
     const m = (payload as { message: unknown }).message
-    message = Array.isArray(m) ? m.join(', ') : String(m)
+    message =
+      typeof m === 'object' && m !== null
+        ? 'Erreur'
+        : Array.isArray(m)
+          ? m.join(', ')
+          : String(m)
   }
-  return { statusCode, message }
+  return { statusCode, message, payload }
 }
 
 export function refreshSession(): Promise<boolean> {

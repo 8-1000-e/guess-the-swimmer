@@ -15,4 +15,5 @@ export interface User {
 export interface ApiError {
   statusCode: number
   message: string
+  payload?: unknown
 }

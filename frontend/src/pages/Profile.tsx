@@ -8,7 +8,7 @@ import Surface from '@/components/ui/Surface'
 import { api } from '@/api/client'
 import { ROUTES } from '@/api/routes'
 import type { ApiError } from '@/types/auth'
-import type { RoundStatus, UserStats } from '@/types/game'
+import type { NeverPlayed, RoundStatus, UserStats } from '@/types/game'
 
 const STATUS: Record<RoundStatus, string> = {
   playing: 'en cours',
@@ -17,25 +17,57 @@ const STATUS: Record<RoundStatus, string> = {
   expired: 'expiré',
 }
 
+function neverPlayedOf(e: ApiError): NeverPlayed | null {
+  const p = e.payload as NeverPlayed | undefined
+  return p?.code === 'NEVER_PLAYED' ? p : null
+}
+
 export default function Profile() {
   const { login = '' } = useParams()
   const [stats, setStats] = useState<UserStats | null>(null)
+  const [absent, setAbsent] = useState<NeverPlayed | null>(null)
   const [error, setError] = useState('')
 
   useEffect(() => {
     setStats(null)
+    setAbsent(null)
     setError('')
     api
       .get<UserStats>(ROUTES.game.user(login))
       .then(setStats)
-      .catch((e: ApiError) => setError(e.message))
+      .catch((e: ApiError) => {
+        const np = neverPlayedOf(e)
+        if (np) setAbsent(np)
+        else setError(`Aucun joueur ne s’appelle « ${login} ».`)
+      })
   }, [login])
 
   return (
     <AppShell>
       <main className="page">
         {error && <p className="error-text">{error}</p>}
-        {!stats && !error && <Loading />}
+        {!stats && !absent && !error && <Loading />}
+
+        {absent && (
+          <>
+            <header className="profile-head">
+              <Avatar src={absent.ftPfpUrl} login={absent.login} size="lg" />
+              <div>
+                <h1 className="page-title">{absent.login}</h1>
+                <p className="page-sub">{absent.displayName ?? '—'}</p>
+              </div>
+            </header>
+
+            <Surface className="notice">
+              <p className="notice-title">Pas encore de compte</p>
+              <p className="notice-text">
+                {absent.staff
+                  ? 'Cette personne fait partie du staff et ne s’est jamais connectée au jeu.'
+                  : 'Cette personne est bien dans la piscine, mais ne s’est jamais connectée. Elle peut quand même te tomber comme cible — et elle pourra signer ton QR dès sa première connexion.'}
+              </p>
+            </Surface>
+          </>
+        )}
 
         {stats && (
           <>

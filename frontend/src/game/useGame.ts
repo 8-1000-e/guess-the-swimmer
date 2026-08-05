@@ -7,7 +7,6 @@ import type {
   LetterResult,
   LetterState,
   Round,
-  Target,
 } from '@/types/game'
 import type { ApiError } from '@/types/auth'
 
@@ -25,21 +24,13 @@ function keyboardStates(rows: LetterResult[][]): Record<string, LetterState> {
 
 export function useGame() {
   const [round, setRound] = useState<Round | null>(null)
-  const [targets, setTargets] = useState<Target[]>([])
   const [current, setCurrent] = useState('')
-  const [solved, setSolved] = useState(false)
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
 
   const load = useCallback(async () => {
-    const [r, t] = await Promise.all([
-      api.get<Round>(ROUTES.game.round),
-      api.get<Target[]>(ROUTES.game.targets),
-    ])
-    setRound(r)
-    setTargets(t)
-    setSolved(r.guesses.some((g) => g.result.every((c) => c.state === 'correct')))
+    setRound(await api.get<Round>(ROUTES.game.round))
     setLoading(false)
   }, [])
 
@@ -51,6 +42,7 @@ export function useGame() {
   }, [load])
 
   const length = round?.length ?? 0
+  const solved = round?.status !== 'playing' && round !== null
 
   const type = useCallback(
     (letter: string) => {
@@ -84,32 +76,31 @@ export function useGame() {
         result: res.result,
         createdAt: new Date().toISOString(),
       }
-      setRound({ ...round, guesses: [...round.guesses, guess] })
-      setTargets((ts) =>
-        ts.map((t) => (t.login === current ? { ...t, guessed: true } : t)),
-      )
+      setRound({
+        ...round,
+        guesses: [...round.guesses, guess],
+        attempts: res.attempts,
+      })
       setCurrent('')
-      setSolved(res.solved)
-      setMessage(res.solved ? `Trouvé en ${res.attempts} essais !` : '')
+      setMessage('')
+      if (res.solved) await load()
     } catch (e) {
       setMessage((e as ApiError).message)
     } finally {
       setSubmitting(false)
     }
-  }, [solved, submitting, round, current])
+  }, [solved, submitting, round, current, load])
 
-  const rows = useMemo(
-    () => round?.guesses.map((g) => g.result) ?? [],
-    [round],
-  )
+  const rows = useMemo(() => round?.guesses.map((g) => g.result) ?? [], [round])
   const keys = useMemo(() => keyboardStates(rows), [rows])
 
   return {
     round,
-    targets,
+    target: round?.target ?? null,
     rows,
     current,
     length,
+    attempts: round?.attempts ?? 0,
     solved,
     message,
     loading,
