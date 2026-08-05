@@ -78,6 +78,14 @@ export class GameService
         return result;
     }
 
+    private hidden(): string[]
+    {
+        return (this.config.get<string>('HIDDEN_LOGINS') ?? 'edubois-')
+            .split(',')
+            .map(l => l.trim().toLowerCase())
+            .filter(Boolean);
+    }
+
     private signBonus()
     {
         return Number(this.config.get('SIGN_BONUS_ATTEMPTS') ?? 5);
@@ -337,6 +345,7 @@ export class GameService
         const met = new Set(rounds.map(r => r.targetLogin));
 
         const swimmers = await this.prisma.swimmer.findMany({
+            where: {login: {notIn: this.hidden()}},
             select: {
                 login: true,
                 displayName: true,
@@ -410,6 +419,7 @@ export class GameService
     async leaderboard()
     {
         const users = await this.prisma.user.findMany({
+            where: {login: {notIn: this.hidden()}},
             include: {rounds: {select: {status: true, attempts: true}}},
         });
 
