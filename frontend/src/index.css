@@ -555,6 +555,127 @@ body {
   color: var(--dimmer);
 }
 
+/* ── comment ça marche ────────────────────────────────────── */
+
+.how-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.how-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 18px;
+}
+
+.how-num {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid rgba(102, 179, 255, 0.35);
+  background: rgba(102, 179, 255, 0.12);
+  color: var(--sky-soft);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.how-title {
+  margin: 2px 0 5px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.how-text {
+  margin: 0 0 9px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--dim);
+}
+.how-text:last-child {
+  margin-bottom: 0;
+}
+.how-text strong {
+  font-weight: 600;
+  color: var(--paper);
+}
+
+.how-colors,
+.how-score {
+  padding: 18px;
+}
+
+.how-tiles {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.how-tiles .tile {
+  width: 42px;
+  aspect-ratio: 1;
+  animation: none;
+}
+
+.how-legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-size: 12.5px;
+  color: var(--dim);
+}
+.how-legend li {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.chip {
+  width: 13px;
+  height: 13px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.chip.correct {
+  background: var(--correct);
+}
+.chip.present {
+  background: var(--present);
+}
+.chip.absent {
+  background: var(--absent);
+}
+
+.how-rules {
+  list-style: none;
+  margin: 0;
+  padding: 6px 18px;
+}
+.how-rules li {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--dim);
+}
+.how-rules li:last-child {
+  border-bottom: 0;
+}
+
+.how-cta {
+  margin: 28px 0 0;
+  text-align: center;
+}
+
 /* ── trombinoscope ────────────────────────────────────────── */
 
 .page-wide {

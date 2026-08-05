@@ -3,6 +3,7 @@ import { AuthProvider } from "@/auth/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import AuthCallback from "@/pages/AuthCallback";
 import Game from "@/pages/Game";
+import HowItWorks from "@/pages/HowItWorks";
 import Leaderboard from "@/pages/Leaderboard";
 import Login from "@/pages/Login";
 import Profile from "@/pages/Profile";
@@ -30,6 +31,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Leaderboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/comment-ca-marche"
+            element={
+              <ProtectedRoute>
+                <HowItWorks />
               </ProtectedRoute>
             }
           />

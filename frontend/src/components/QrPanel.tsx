@@ -82,7 +82,7 @@ export default function QrPanel({ target, signBonus }: QrPanelProps) {
         </a>
 
         <p className="qr-why">
-          Va lui parler, c’est tout l’intérêt du jeu. Pas de signature, pas de
+          Pas de signature, pas de
           point : c’est elle qui prouve que vous vous êtes rencontrés, et elle
           efface {signBonus} essais. Sans elle, <strong>{name}</strong> pourra
           retomber.
