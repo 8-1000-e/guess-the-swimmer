@@ -119,7 +119,7 @@ export default function Login() {
       <div className="login-veil" aria-hidden="true" />
 
       <div className="login-col">
-        <p className="login-brand">guess the swimmer</p>
+        <p className="login-brand">guess the login</p>
 
         <div
           className={`login-field ${fading ? 'is-fading' : ''}`}

@@ -75,7 +75,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
     <div className="app">
       <aside className="sidebar">
         <p className="logo">
-          guess the <span>swimmer</span>
+          guess the <span>login</span>
         </p>
 
         <nav className="nav">

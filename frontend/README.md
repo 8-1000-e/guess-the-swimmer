@@ -1,4 +1,4 @@
-# Guess the Swimmer — frontend
+# guess the login — frontend
 
 React + TypeScript + Vite. Wordle-like sur les logins de la piscine August 2026.
 

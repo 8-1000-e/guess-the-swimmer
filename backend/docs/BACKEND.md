@@ -1,4 +1,4 @@
-# Guess the Swimmer, backend
+# guess the login, backend
 
 NestJS + Prisma + Supabase (Postgres).
 
