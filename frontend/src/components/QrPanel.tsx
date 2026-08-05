@@ -82,10 +82,8 @@ export default function QrPanel({ target, signBonus }: QrPanelProps) {
         </a>
 
         <p className="qr-why">
-          <strong>{name}</strong> compte déjà dans tes trouvés. Sa signature y
-          ajoute le point qui départage le classement, te rembourse {signBonus}{' '}
-          essais et clôt cette cible pour de bon — sinon elle pourra retomber un
-          autre jour.
+          Sa signature vaut le point du classement et te rembourse {signBonus}{' '}
+          essais. Sans elle, <strong>{name}</strong> pourra retomber.
         </p>
       </div>
 
