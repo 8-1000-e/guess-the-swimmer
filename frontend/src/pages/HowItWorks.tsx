@@ -101,8 +101,8 @@ export default function HowItWorks() {
             Le plus bas gagne.
           </p>
           <p className="how-text">
-            Chaque signature efface {bonus ?? 'plusieurs'} essais de ton total —
-            c’est ce qui récompense d’aller parler aux gens plutôt que de
+            Chaque signature efface {bonus ?? 'plusieurs'} essais de ton total.
+            C’est ce qui récompense d’aller parler aux gens plutôt que de
             deviner vite.
           </p>
         </Surface>

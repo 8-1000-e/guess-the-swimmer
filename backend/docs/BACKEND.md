@@ -1,4 +1,4 @@
-# Guess the Swimmer — backend
+# Guess the Swimmer, backend
 
 NestJS + Prisma + Supabase (Postgres).
 
@@ -21,7 +21,7 @@ NestJS + Prisma + Supabase (Postgres).
 ## Whitelist
 
 Elle est reconstruite au démarrage par `PoolService` (`OnModuleInit`), depuis
-l'API 42 — il n'y a plus de CSV.
+l'API 42. Il n'y a plus de CSV.
 
 - **Piscineux** : `/v2/campus/{FT_CAMPUS_ID}/users` filtré sur la piscine du mois
   en cours, calculée en heure de Paris. Insérés avec `staff = false`.
@@ -83,15 +83,15 @@ Trouveur (manche solved)                  Cible (connectée)
 
 | Méthode | Route                 | Auth | Rôle                                                |
 | ------- | --------------------- | ---- | --------------------------------------------------- |
-| `GET`   | `/auth/42`            | —    | redirige vers l'autorisation 42                      |
-| `GET`   | `/auth/42/callback`   | —    | whitelist, upsert joueur, redirige avec les tokens   |
-| `POST`  | `/refresh`            | —    | `{ refresh_token }` → nouveaux tokens                |
+| `GET`   | `/auth/42`            | .    | redirige vers l'autorisation 42                      |
+| `GET`   | `/auth/42/callback`   | .    | whitelist, upsert joueur, redirige avec les tokens   |
+| `POST`  | `/refresh`            | .    | `{ refresh_token }` → nouveaux tokens                |
 | `POST`  | `/logout`             | JWT  | révoque le refresh token                             |
 | `GET`   | `/me`                 | JWT  | profil du joueur                                     |
 | `GET`   | `/game/round`         | JWT  | manche du jour (longueur de la cible, pas le login)  |
 | `POST`  | `/game/guess`         | JWT  | `{ guess }` → résultat coloré, `solved`, `attempts`  |
 | `GET`   | `/game/rounds/:id/qr` | JWT  | token QR rotatif, manche `solved` du joueur          |
-| `POST`  | `/game/sign`          | JWT  | `{ token }` — appelé par **la cible**                |
+| `POST`  | `/game/sign`          | JWT  | `{ token }`, appelé par **la cible**                |
 | `GET`   | `/game/pending`       | JWT  | manches trouvées en attente de signature             |
 | `GET`   | `/game/leaderboard`   | JWT  | classement du mois                                   |
 

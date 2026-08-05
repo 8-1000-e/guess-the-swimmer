@@ -93,7 +93,7 @@ export default function Roster() {
 
                   <span className="face-login mono">{p.login}</span>
                   <span className="face-name">
-                    {p.me ? 'toi' : p.staff ? 'staff' : (p.displayName ?? '—')}
+                    {p.me ? 'toi' : p.staff ? 'staff' : (p.displayName ?? '···')}
                   </span>
                   <span className="face-out" aria-hidden="true">
                     <svg viewBox="0 0 24 24" width="11" height="11" fill="none">

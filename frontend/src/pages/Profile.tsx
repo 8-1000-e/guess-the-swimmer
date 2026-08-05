@@ -54,7 +54,7 @@ export default function Profile() {
               <Avatar src={absent.ftPfpUrl} login={absent.login} size="lg" />
               <div>
                 <h1 className="page-title">{absent.login}</h1>
-                <p className="page-sub">{absent.displayName ?? '—'}</p>
+                <p className="page-sub">{absent.displayName ?? '···'}</p>
               </div>
             </header>
 
@@ -63,7 +63,7 @@ export default function Profile() {
               <p className="notice-text">
                 {absent.staff
                   ? 'Cette personne fait partie du staff et ne s’est jamais connectée au jeu.'
-                  : 'Cette personne est bien dans la piscine, mais ne s’est jamais connectée. Elle peut quand même te tomber comme cible — et elle pourra signer ton QR dès sa première connexion.'}
+                  : 'Cette personne est bien dans la piscine, mais ne s’est jamais connectée. Elle peut quand même te tomber comme cible, et elle pourra signer ton QR dès sa première connexion.'}
               </p>
             </Surface>
           </>
