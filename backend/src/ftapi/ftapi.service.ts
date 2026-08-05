@@ -2,10 +2,13 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { FtProfile, FtTokenResponse } from './ftapi.types';
 
+const LOCATION_TTL = 60_000;
+
 @Injectable()
 export class FtApiService {
   private appToken: string | null = null;
   private appTokenExpiresAt = 0;
+  private locations = new Map<string, { value: string | null; until: number }>();
 
   constructor(private readonly config: ConfigService) {}
 
@@ -60,6 +63,24 @@ export class FtApiService {
     this.appToken = data.access_token;
     this.appTokenExpiresAt = Date.now() + (data.expires_in - 60) * 1000;
     return data.access_token;
+  }
+
+  async getLocation(login: string): Promise<string | null> {
+    const cached = this.locations.get(login);
+    if (cached && Date.now() < cached.until) return cached.value;
+
+    let value: string | null = null;
+    try {
+      const u = await this.get<{ location: string | null }>(
+        `/v2/users/${login}`,
+      );
+      value = u.location ?? null;
+    } catch {
+      value = null;
+    }
+
+    this.locations.set(login, { value, until: Date.now() + LOCATION_TTL });
+    return value;
   }
 
   async get<T>(path: string): Promise<T> {

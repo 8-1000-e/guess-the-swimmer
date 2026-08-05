@@ -22,16 +22,14 @@ export class PoolService implements OnModuleInit {
     private readonly config: ConfigService,
   ) {}
 
-  async onModuleInit() {
+  onModuleInit() {
     if (this.config.get('POOL_SYNC_ON_BOOT') === 'false') return;
 
-    try {
-      await this.sync();
-    } catch (e) {
+    void this.sync().catch((e: Error) =>
       this.logger.error(
-        `sync impossible, la whitelist en base est conservée: ${(e as Error).message}`,
-      );
-    }
+        `sync impossible, la whitelist en base est conservée: ${e.message}`,
+      ),
+    );
   }
 
   currentPool() {

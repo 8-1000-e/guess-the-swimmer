@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { PrismaService } from "src/prisma/prisma.service";
+import { FtApiService } from "src/ftapi/ftapi.service";
 import { UnauthorizedException } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
 import { randomBytes } from "crypto";
@@ -19,6 +20,7 @@ export class GameService
     constructor (
         private readonly prisma: PrismaService,
         private readonly config: ConfigService,
+        private readonly ft: FtApiService,
     )
     {}
     
@@ -83,11 +85,22 @@ export class GameService
 
         const existing = await this.prisma.round.findUnique({
           where: { playerId_assignedOn: { playerId: ftId, assignedOn: this.today() } },
-          include: { guesses: { orderBy: { createdAt: 'asc' } } },
+          include: { guesses: { orderBy: { createdAt: 'asc' } }, target: true },
         });
 
-        if (existing) 
-            return { length: existing.targetLogin.length, guesses: existing.guesses };
+        if (existing)
+            return {
+                length: existing.targetLogin.length,
+                guesses: existing.guesses,
+                status: existing.status,
+                attempts: existing.attempts,
+                target: existing.status === 'playing' ? null : {
+                    login: existing.target.login,
+                    displayName: existing.target.displayName,
+                    ftPfpUrl: existing.target.ftPfpUrl,
+                    location: await this.ft.getLocation(existing.target.login),
+                },
+            };
 
 
         const alreadyFound = await this.prisma.round.findMany({
@@ -121,7 +134,13 @@ export class GameService
                     assignedOn: this.today(),
                 }
             });
-            return {length: target.length, guesses: [] };
+            return {
+                length: target.length,
+                guesses: [],
+                status: 'playing' as const,
+                attempts: 0,
+                target: null,
+            };
         }
         catch (e)
         {
@@ -130,9 +149,20 @@ export class GameService
 
             const raced = await this.prisma.round.findUnique({
                 where: {playerId_assignedOn: {playerId: ftId, assignedOn: this.today()}},
-                include: {guesses: {orderBy: {createdAt: 'asc'}}},
+                include: {guesses: {orderBy: {createdAt: 'asc'}}, target: true},
             });
-            return {length: raced!.targetLogin.length, guesses: raced!.guesses};
+            return {
+                length: raced!.targetLogin.length,
+                guesses: raced!.guesses,
+                status: raced!.status,
+                attempts: raced!.attempts,
+                target: raced!.status === 'playing' ? null : {
+                    login: raced!.target.login,
+                    displayName: raced!.target.displayName,
+                    ftPfpUrl: raced!.target.ftPfpUrl,
+                    location: await this.ft.getLocation(raced!.target.login),
+                },
+            };
         }
     }
 
@@ -335,7 +365,22 @@ export class GameService
                 },
             },
         });
-        if (!user) throw new NotFoundException('Unknown player');
+        if (!user) {
+            const swimmer = await this.prisma.swimmer.findUnique({
+                where: {login},
+                select: {login: true, displayName: true, ftPfpUrl: true, staff: true},
+            });
+            if (!swimmer)
+                throw new NotFoundException({code: 'UNKNOWN_LOGIN', login});
+
+            throw new NotFoundException({
+                code: 'NEVER_PLAYED',
+                login: swimmer.login,
+                displayName: swimmer.displayName,
+                ftPfpUrl: swimmer.ftPfpUrl,
+                staff: swimmer.staff,
+            });
+        }
 
         return {
             login: user.login,
