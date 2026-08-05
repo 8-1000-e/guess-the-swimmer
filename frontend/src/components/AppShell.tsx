@@ -83,10 +83,6 @@ export default function AppShell({ children }: { children: ReactNode }) {
             <Icon>{ICONS.game}</Icon>
             Jeu
           </NavLink>
-          <NavLink to="/comment-ca-marche" className="nav-link">
-            <Icon>{ICONS.help}</Icon>
-            Comment ça marche
-          </NavLink>
           <NavLink to="/trombinoscope" className="nav-link">
             <Icon>{ICONS.faces}</Icon>
             Trombinoscope
@@ -102,6 +98,11 @@ export default function AppShell({ children }: { children: ReactNode }) {
             </NavLink>
           )}
         </nav>
+
+        <NavLink to="/comment-ca-marche" className="nav-link nav-foot">
+          <Icon>{ICONS.help}</Icon>
+          Comment ça marche
+        </NavLink>
 
         <div className="side-user">
           {user && <Avatar src={user.ftPfpUrl} login={user.login} />}

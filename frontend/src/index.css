@@ -202,11 +202,14 @@ body {
   opacity: 1;
 }
 
+.nav-foot {
+  margin-top: auto;
+}
+
 .side-user {
   display: flex;
   align-items: center;
   gap: 9px;
-  margin-top: auto;
   padding: 10px;
   border-radius: var(--r-md);
   background: rgba(255, 255, 255, 0.035);
@@ -1692,8 +1695,10 @@ body {
     padding: 8px 11px;
     font-size: 12.5px;
   }
-  .side-user {
+  .nav-foot {
     margin-top: 0;
+  }
+  .side-user {
     padding: 5px 7px;
   }
   .side-login {
