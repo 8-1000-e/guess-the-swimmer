@@ -82,8 +82,10 @@ export default function QrPanel({ target, signBonus }: QrPanelProps) {
         </a>
 
         <p className="qr-why">
-          Sa signature vaut le point du classement et te rembourse {signBonus}{' '}
-          essais. Sans elle, <strong>{name}</strong> pourra retomber.
+          Va lui parler, c’est tout l’intérêt du jeu. Pas de signature, pas de
+          point : c’est elle qui prouve que vous vous êtes rencontrés, et elle
+          efface {signBonus} essais. Sans elle, <strong>{name}</strong> pourra
+          retomber.
         </p>
       </div>
 
