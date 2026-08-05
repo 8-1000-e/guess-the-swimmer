@@ -4,6 +4,7 @@ import Board from '@/components/Board'
 import Keyboard from '@/components/Keyboard'
 import QrPanel from '@/components/QrPanel'
 import TargetList from '@/components/TargetList'
+import Loading from '@/components/ui/Loading'
 import { useGame } from '@/game/useGame'
 
 export default function Game() {
@@ -20,16 +21,28 @@ export default function Game() {
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [game])
 
+  const tries = game.rows.length
+
   return (
     <AppShell>
       <div className="layout">
         <main className="game">
           {game.loading ? (
-            <p className="hint mono">Chargement…</p>
+            <Loading label="Tirage de ta cible" />
           ) : (
             <>
-              <p className={`message ${game.solved ? 'won' : ''}`}>
-                {game.message || ' '}
+              <div className="game-head">
+                <p className="game-target">
+                  Cible du jour · {game.length} lettres · {tries} essai
+                  {tries > 1 ? 's' : ''}
+                </p>
+              </div>
+
+              <p
+                className={`message ${game.solved ? 'won' : game.message ? 'err' : ''}`}
+                aria-live="polite"
+              >
+                {game.solved && !game.message ? 'Trouvé.' : game.message || ' '}
               </p>
 
               <Board
@@ -50,11 +63,6 @@ export default function Game() {
                   disabled={game.submitting}
                 />
               )}
-
-              <p className="hint mono">
-                {game.length} lettres · {game.rows.length} essai
-                {game.rows.length > 1 ? 's' : ''}
-              </p>
             </>
           )}
         </main>

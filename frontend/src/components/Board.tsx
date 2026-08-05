@@ -13,7 +13,11 @@ export default function Board({ rows, current, length, solved }: BoardProps) {
       {rows.map((row, i) => (
         <div className="row" key={`played-${i}`}>
           {row.map((cell, j) => (
-            <div className={`tile ${cell.state}`} key={j}>
+            <div
+              className={`tile ${cell.state}`}
+              key={j}
+              style={{ animationDelay: `${j * 0.05}s` }}
+            >
               {cell.letter}
             </div>
           ))}

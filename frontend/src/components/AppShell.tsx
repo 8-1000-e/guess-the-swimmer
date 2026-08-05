@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useAuth } from '@/auth/useAuth'
+import Avatar from './ui/Avatar'
 
 export default function AppShell({ children }: { children: ReactNode }) {
   const { user, logout } = useAuth()
@@ -8,9 +9,9 @@ export default function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="app">
       <header className="topbar">
-        <h1 className="logo">
-          Guess the <span className="accent">Swimmer</span>
-        </h1>
+        <p className="logo">
+          guess the <span>swimmer</span>
+        </p>
 
         <nav className="nav">
           <NavLink to="/" end className="nav-link">
@@ -27,12 +28,10 @@ export default function AppShell({ children }: { children: ReactNode }) {
         </nav>
 
         <div className="topbar-right">
-          {user?.ftPfpUrl && (
-            <img className="avatar" src={user.ftPfpUrl} alt="" />
-          )}
+          {user && <Avatar src={user.ftPfpUrl} login={user.login} />}
           <span className="mono">{user?.login}</span>
-          <button type="button" className="btn-ghost" onClick={() => logout()}>
-            Déconnexion
+          <button type="button" className="btn-glass" onClick={() => logout()}>
+            Quitter
           </button>
         </div>
       </header>

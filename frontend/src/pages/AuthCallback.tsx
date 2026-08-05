@@ -2,6 +2,8 @@ import { useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/auth/useAuth'
 import { tokenStore } from '@/auth/tokenStore'
+import Loading from '@/components/ui/Loading'
+import Surface from '@/components/ui/Surface'
 import { PENDING_SIGN_KEY } from './Sign'
 
 export default function AuthCallback() {
@@ -41,7 +43,9 @@ export default function AuthCallback() {
 
   return (
     <main className="auth">
-      <p className="auth-sub">Connexion en cours…</p>
+      <Surface as="section" className="auth-card">
+        <Loading label="Connexion en cours" />
+      </Surface>
     </main>
   )
 }

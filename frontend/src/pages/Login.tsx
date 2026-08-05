@@ -105,12 +105,12 @@ export default function Login() {
     )
 
     if (reducedMotion) {
-      timers.current.push(window.setTimeout(reset, 2500))
+      timers.current.push(window.setTimeout(reset, 3000))
       return
     }
 
-    timers.current.push(window.setTimeout(() => setFading(true), 2500))
-    timers.current.push(window.setTimeout(reset, 3000))
+    timers.current.push(window.setTimeout(() => setFading(true), 3000))
+    timers.current.push(window.setTimeout(reset, 3700))
   }
 
   return (

@@ -1,0 +1,123 @@
+{
+  "version": 1,
+  "project": {
+    "name": "frontend",
+    "productType": "Jeu social type Wordle pour la piscine 42 d'Angouleme",
+    "stack": [
+      "react",
+      "vite"
+    ]
+  },
+  "sources": {
+    "tokens": [
+      "src/index.css"
+    ],
+    "components": [
+      "src/components/ui"
+    ],
+    "assets": [
+      "src/assets"
+    ],
+    "instructions": []
+  },
+  "design": {
+    "colorMode": "dark",
+    "colors": {
+      "--border": {
+        "value": "#262b33",
+        "source": "src/index.css"
+      },
+      "--border-strong": {
+        "value": "#363c46",
+        "source": "src/index.css"
+      },
+      "--muted": {
+        "value": "#6e7681",
+        "source": "src/index.css"
+      },
+      "--accent": {
+        "value": "#00babc",
+        "source": "src/index.css"
+      }
+    },
+    "typography": {
+      "--text": {
+        "value": "#e8eaed",
+        "source": "src/index.css"
+      },
+      "--text-dim": {
+        "value": "#a3aab6",
+        "source": "src/index.css"
+      },
+      "--font-sans": {
+        "value": "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+        "source": "src/index.css"
+      },
+      "--font-mono": {
+        "value": "ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace",
+        "source": "src/index.css"
+      }
+    },
+    "spacing": {},
+    "radius": {},
+    "shadows": {},
+    "motion": {},
+    "density": "comfortable"
+  },
+  "components": {
+    "installed": [
+      "animated-gradient"
+    ],
+    "preferredPrimitives": [],
+    "patterns": []
+  },
+  "constraints": {
+    "must": [
+      "CSS pur dans src/index.css, tokens en :root",
+      "Palette piscine nocturne : encre #05080c, ciel #66b3ff, papier #e8edf2",
+      "Le monospace est la police d'affichage, pas seulement utilitaire",
+      "Surfaces en verre : backdrop-filter + arete lumineuse interne",
+      "Respecter prefers-reduced-motion partout"
+    ],
+    "avoid": [
+      "Tailwind, shadcn, radix : le projet n'en a pas et n'en veut pas",
+      "Ancien accent teal #00babc, remplace par le ciel #66b3ff",
+      "Cartes empilees et gradients decoratifs sans raison"
+    ]
+  },
+  "decisions": [
+    {
+      "date": "2026-08-05",
+      "choice": "DA piscine nocturne etablie sur l'ecran de login, etendue a toute l'app",
+      "why": "Le shader Prism, le mono en display et le verre liquide viennent du login valide par l'utilisateur"
+    },
+    {
+      "date": "2026-08-05",
+      "choice": "Catalogue 21st utilise en reference uniquement, pas installe",
+      "why": "Les items sont Tailwind/shadcn/radix, incompatibles avec un projet en CSS pur"
+    }
+  ],
+  "evidence": [
+    {
+      "fact": "components.installed",
+      "source": "src/components/ui"
+    },
+    {
+      "fact": "design.colorMode:light",
+      "source": "src/index.css"
+    },
+    {
+      "fact": "design.tokens",
+      "source": "src/index.css"
+    },
+    {
+      "fact": "project.stack:react",
+      "source": "package.json"
+    },
+    {
+      "fact": "project.stack:vite",
+      "source": "package.json"
+    }
+  ],
+  "generatedAt": "2026-08-05T13:12:22.198Z"
+}

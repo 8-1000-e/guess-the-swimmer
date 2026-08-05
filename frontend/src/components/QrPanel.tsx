@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
 import { api } from '@/api/client'
 import { ROUTES } from '@/api/routes'
+import Surface from './ui/Surface'
+import Loading from './ui/Loading'
 import type { ApiError } from '@/types/auth'
 import type { QrToken } from '@/types/game'
 
@@ -24,20 +26,29 @@ export default function QrPanel() {
     return () => clearInterval(id)
   }, [refresh])
 
-  if (error) return <p className="error-text">{error}</p>
-  if (!qr) return <p className="hint mono">Génération du QR…</p>
+  if (error)
+    return (
+      <Surface className="qr-panel">
+        <p className="error-text">{error}</p>
+      </Surface>
+    )
 
-  const url = `${window.location.origin}/sign/${qr.token}`
+  if (!qr)
+    return (
+      <Surface className="qr-panel">
+        <Loading label="Génération du QR" />
+      </Surface>
+    )
 
   return (
-    <div className="qr-panel">
-      <p className="qr-title">Fais signer ta cible</p>
+    <Surface className="qr-panel">
+      <p className="qr-title">Fais-le scanner à ta cible</p>
       <div className="qr-frame">
-        <QRCodeSVG value={url} size={188} bgColor="#ffffff" fgColor="#0b0d10" />
+        <QRCodeSVG value={`${window.location.origin}/sign/${qr.token}`} size={184} />
       </div>
-      <p className="hint mono">
-        Elle le scanne avec son téléphone, connectée à son compte 42.
+      <p className="hint">
+        Elle le scanne depuis son téléphone, connectée à son compte 42.
       </p>
-    </div>
+    </Surface>
   )
 }

@@ -1,8 +1,12 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { api } from '@/api/client'
 import { ROUTES } from '@/api/routes'
 import { useAuth } from '@/auth/useAuth'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
+import AnimatedGradient from '@/components/ui/animated-gradient'
+import Loading from '@/components/ui/Loading'
+import Surface from '@/components/ui/Surface'
 import type { ApiError } from '@/types/auth'
 import type { SignResponse } from '@/types/game'
 
@@ -11,9 +15,15 @@ export const PENDING_SIGN_KEY = 'gts_pending_sign'
 export default function Sign() {
   const { token = '' } = useParams()
   const { isAuthenticated, loading, loginWith42 } = useAuth()
+  const reducedMotion = useReducedMotion()
   const [result, setResult] = useState<SignResponse | null>(null)
   const [error, setError] = useState('')
   const done = useRef(false)
+
+  const gradient = useMemo(
+    () => ({ preset: 'Prism' as const, speed: reducedMotion ? 0 : 18 }),
+    [reducedMotion],
+  )
 
   useEffect(() => {
     if (loading || done.current) return
@@ -33,32 +43,43 @@ export default function Sign() {
 
   return (
     <main className="auth">
-      <div className="auth-card">
-        <h1 className="auth-title">
-          Guess the <span className="accent">Swimmer</span>
-        </h1>
+      <AnimatedGradient config={gradient} noise={{ opacity: 0.35 }} />
+      <div className="login-veil" aria-hidden="true" />
 
-        {loading && <p className="auth-sub">Connexion…</p>}
-        {!loading && !result && !error && (
-          <p className="auth-sub">Validation en cours…</p>
+      <Surface as="section" className="auth-card">
+        {(loading || (!result && !error)) && (
+          <Loading label={loading ? 'Connexion' : 'Validation'} />
         )}
 
-        {error && <p className="error-text">{error}</p>}
+        {error && (
+          <>
+            <div className="auth-icon ko" aria-hidden="true">
+              ✕
+            </div>
+            <h1 className="auth-title">Signature refusée</h1>
+            <p className="auth-sub">{error}</p>
+          </>
+        )}
 
         {result && (
           <>
-            <p className="sign-ok">Signé</p>
+            <div className="auth-icon ok" aria-hidden="true">
+              ✓
+            </div>
+            <h1 className="auth-title">C’est signé</h1>
             <p className="auth-sub">
-              {result.player?.login} valide sa cible, {result.bonus} essais
-              remboursés.
+              <span className="qr-target">{result.player?.login}</span> valide sa
+              cible et récupère {result.bonus} essais.
             </p>
           </>
         )}
 
-        <Link to="/" className="btn">
-          Retour au jeu
-        </Link>
-      </div>
+        <div className="auth-actions">
+          <Link to="/" className="btn-glass">
+            Aller au jeu
+          </Link>
+        </div>
+      </Surface>
     </main>
   )
 }

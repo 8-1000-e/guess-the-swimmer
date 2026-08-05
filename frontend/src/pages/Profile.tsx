@@ -1,14 +1,18 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import AppShell from '@/components/AppShell'
+import Avatar from '@/components/ui/Avatar'
+import Loading from '@/components/ui/Loading'
+import Stat from '@/components/ui/Stat'
+import Surface from '@/components/ui/Surface'
 import { api } from '@/api/client'
 import { ROUTES } from '@/api/routes'
 import type { ApiError } from '@/types/auth'
 import type { RoundStatus, UserStats } from '@/types/game'
 
-const STATUS_LABEL: Record<RoundStatus, string> = {
+const STATUS: Record<RoundStatus, string> = {
   playing: 'en cours',
-  solved: 'trouvé, non signé',
+  solved: 'à signer',
   validated: 'validé',
   expired: 'expiré',
 }
@@ -31,70 +35,59 @@ export default function Profile() {
     <AppShell>
       <main className="page">
         {error && <p className="error-text">{error}</p>}
-        {!stats && !error && <p className="hint mono">Chargement…</p>}
+        {!stats && !error && <Loading />}
 
         {stats && (
           <>
             <header className="profile-head">
-              {stats.ftPfpUrl && (
-                <img className="avatar lg" src={stats.ftPfpUrl} alt="" />
-              )}
+              <Avatar src={stats.ftPfpUrl} login={stats.login} size="lg" />
               <div>
-                <h2 className="page-title">{stats.login}</h2>
-                <p className="hint mono">{stats.campus ?? '—'}</p>
+                <h1 className="page-title">{stats.login}</h1>
+                <p className="page-sub">{stats.campus ?? 'campus inconnu'}</p>
               </div>
             </header>
 
             <div className="stats">
-              <div className="stat">
-                <span className="stat-value">{stats.validated}</span>
-                <span className="stat-label mono">signés</span>
-              </div>
-              <div className="stat">
-                <span className="stat-value">{stats.found}</span>
-                <span className="stat-label mono">trouvés</span>
-              </div>
-              <div className="stat">
-                <span className="stat-value">{stats.attempts}</span>
-                <span className="stat-label mono">essais</span>
-              </div>
-              <div className="stat">
-                <span className="stat-value">{stats.played}</span>
-                <span className="stat-label mono">manches</span>
-              </div>
+              <Stat value={stats.validated} label="signés" highlight />
+              <Stat value={stats.found} label="trouvés" />
+              <Stat value={stats.attempts} label="essais" />
+              <Stat value={stats.played} label="manches" />
             </div>
 
-            <h3 className="section-title mono">Historique</h3>
-            {stats.rounds.length === 0 ? (
-              <p className="hint mono">Aucune manche jouée.</p>
-            ) : (
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th>Jour</th>
-                    <th>Cible</th>
-                    <th>Statut</th>
-                    <th className="num">Essais</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {stats.rounds.map((r) => (
-                    <tr key={`${r.assignedOn}-${r.targetLogin}`}>
-                      <td className="mono muted">
-                        {r.assignedOn.slice(0, 10)}
-                      </td>
-                      <td className="mono">
-                        {r.targetLogin ?? '—'}
-                      </td>
-                      <td className={`status ${r.status}`}>
-                        {STATUS_LABEL[r.status]}
-                      </td>
-                      <td className="num mono">{r.attempts}</td>
+            <h2 className="section-title">Historique</h2>
+
+            <Surface className="table-wrap">
+              {stats.rounds.length === 0 ? (
+                <p className="empty">Aucune manche jouée pour l’instant.</p>
+              ) : (
+                <table className="table">
+                  <thead>
+                    <tr>
+                      <th>Jour</th>
+                      <th>Cible</th>
+                      <th>Statut</th>
+                      <th className="num">Essais</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
+                  </thead>
+                  <tbody>
+                    {stats.rounds.map((r) => (
+                      <tr key={`${r.assignedOn}-${r.targetLogin ?? 'x'}`}>
+                        <td className="mono muted">
+                          {r.assignedOn.slice(0, 10)}
+                        </td>
+                        <td className="mono">{r.targetLogin ?? '········'}</td>
+                        <td>
+                          <span className={`badge ${r.status}`}>
+                            {STATUS[r.status]}
+                          </span>
+                        </td>
+                        <td className="num">{r.attempts}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </Surface>
           </>
         )}
       </main>

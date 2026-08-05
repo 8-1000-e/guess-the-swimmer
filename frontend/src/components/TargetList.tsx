@@ -1,13 +1,16 @@
+import Surface from './ui/Surface'
 import type { Target } from '@/types/game'
 
 export default function TargetList({ targets }: { targets: Target[] }) {
   const left = targets.filter((t) => !t.validated).length
 
   return (
-    <aside className="targets">
-      <h2 className="targets-title mono">
-        Cibles <span className="muted">{left} restantes</span>
-      </h2>
+    <Surface as="aside" className="targets">
+      <div className="targets-head">
+        <h2 className="targets-title">Reste à valider</h2>
+        <span className="targets-count">{left}</span>
+      </div>
+
       <ul className="targets-list">
         {targets.map((t) => {
           const state = t.validated
@@ -18,17 +21,24 @@ export default function TargetList({ targets }: { targets: Target[] }) {
                 ? 'pending'
                 : ''
           return (
-            <li key={t.login} className={`target ${state}`}>
+            <li key={t.login} className={`target ${state}`.trim()}>
               {t.login}
             </li>
           )
         })}
       </ul>
-      <p className="targets-legend mono">
-        <span className="dot tried" /> déjà tenté aujourd'hui
-        <span className="dot pending" /> en attente de signature
-        <span className="dot done" /> validé
+
+      <p className="legend">
+        <span>
+          <i className="dot tried" /> tenté aujourd’hui
+        </span>
+        <span>
+          <i className="dot pending" /> à faire signer
+        </span>
+        <span>
+          <i className="dot done" /> validé
+        </span>
       </p>
-    </aside>
+    </Surface>
   )
 }
