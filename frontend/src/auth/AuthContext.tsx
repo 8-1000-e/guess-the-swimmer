@@ -6,7 +6,7 @@ import {
   useState,
   type ReactNode,
 } from 'react'
-import { api } from '@/api/client'
+import { api, refreshSession } from '@/api/client'
 import { API_BASE_URL, ROUTES } from '@/api/routes'
 import { tokenStore } from './tokenStore'
 import type { Tokens, User } from '@/types/auth'
@@ -55,18 +55,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let cancelled = false
 
     async function restore() {
-      const refresh_token = tokenStore.getRefreshToken()
-      if (!refresh_token) {
+      if (!tokenStore.getRefreshToken()) {
         if (!cancelled) setLoading(false)
         return
       }
       try {
-        const tokens = await api.post<Tokens>(
-          ROUTES.auth.refresh,
-          { refresh_token },
-          { auth: false },
-        )
-        tokenStore.set(tokens)
+        if (!(await refreshSession())) throw new Error('refresh failed')
         const me = await api.get<User>(ROUTES.users.me)
         if (!cancelled) setUser(me)
       } catch {
@@ -82,6 +76,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       cancelled = true
     }
   }, [])
+
+  useEffect(
+    () =>
+      tokenStore.subscribe(() => {
+        if (!tokenStore.getRefreshToken()) setUser(null)
+      }),
+    [],
+  )
 
   const value = useMemo<AuthContextValue>(
     () => ({

@@ -110,7 +110,6 @@ body {
   min-height: 100vh;
   min-height: 100dvh;
   display: flex;
-  flex-direction: column;
   isolation: isolate;
 }
 
@@ -126,48 +125,68 @@ body {
     linear-gradient(to bottom, var(--ink-2), var(--ink) 55%);
 }
 
-.topbar {
+.app-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar {
   position: sticky;
   top: 0;
   z-index: 10;
+  flex-shrink: 0;
+  width: 214px;
+  height: 100vh;
+  height: 100dvh;
   display: flex;
-  align-items: center;
-  gap: 18px;
-  padding: 12px 22px;
-  border-bottom: 1px solid var(--line);
-  background: rgba(5, 8, 12, 0.72);
+  flex-direction: column;
+  gap: 26px;
+  padding: 24px 16px 18px;
+  border-right: 1px solid var(--line);
+  background: rgba(5, 8, 12, 0.66);
   backdrop-filter: blur(18px) saturate(160%);
   -webkit-backdrop-filter: blur(18px) saturate(160%);
 }
 
 .logo {
   margin: 0;
+  padding: 0 8px;
   font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.26em;
+  font-size: 10.5px;
+  line-height: 1.7;
+  letter-spacing: 0.24em;
   text-transform: uppercase;
   color: var(--dim);
-  white-space: nowrap;
 }
 .logo span {
+  display: block;
   color: var(--sky-soft);
 }
 
 .nav {
   display: flex;
-  gap: 2px;
-  margin-right: auto;
+  flex-direction: column;
+  gap: 3px;
 }
 
 .nav-link {
-  padding: 7px 13px;
-  border-radius: var(--r-pill);
-  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 9px 12px;
+  border-radius: var(--r-md);
+  font-size: 13.5px;
   text-decoration: none;
   color: var(--dim);
   transition:
     color 0.2s var(--ease),
     background 0.2s var(--ease);
+}
+.nav-link svg {
+  flex-shrink: 0;
+  opacity: 0.75;
 }
 .nav-link:hover {
   color: var(--paper);
@@ -176,14 +195,53 @@ body {
 .nav-link.active {
   color: var(--paper);
   background: rgba(102, 179, 255, 0.14);
+  box-shadow: inset 0 0 0 1px rgba(102, 179, 255, 0.18);
+}
+.nav-link.active svg {
+  color: var(--sky);
+  opacity: 1;
 }
 
-.topbar-right {
+.side-user {
   display: flex;
   align-items: center;
-  gap: 11px;
-  font-size: 13px;
+  gap: 9px;
+  margin-top: auto;
+  padding: 10px;
+  border-radius: var(--r-md);
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid var(--line);
+}
+
+.side-login {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
   color: var(--dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.side-out {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--dim);
+  cursor: pointer;
+  transition:
+    color 0.18s var(--ease),
+    background 0.18s var(--ease);
+}
+.side-out:hover {
+  color: var(--danger-soft);
+  background: rgba(229, 83, 75, 0.12);
 }
 
 .avatar {
@@ -193,6 +251,7 @@ body {
   object-fit: cover;
   border: 1px solid var(--line-strong);
   background: var(--ink-2);
+  flex-shrink: 0;
 }
 .avatar.sm {
   width: 21px;
@@ -465,7 +524,7 @@ body {
 .targets {
   padding: 15px;
   position: sticky;
-  top: 74px;
+  top: 30px;
 }
 
 .targets-head {
@@ -1089,23 +1148,60 @@ body {
   }
 }
 
-@media (max-width: 620px) {
-  .topbar {
-    flex-wrap: wrap;
-    gap: 10px 14px;
-    padding: 11px 16px;
+@media (max-width: 780px) {
+  .app {
+    flex-direction: column;
+  }
+  .sidebar {
+    flex-direction: row;
+    align-items: center;
+    gap: 14px;
+    width: auto;
+    height: auto;
+    padding: 10px 16px;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .logo {
+    padding: 0;
+    font-size: 9.5px;
+    letter-spacing: 0.18em;
+  }
+  .logo span {
+    display: inline;
   }
   .nav {
-    order: 3;
-    width: 100%;
-    margin-right: 0;
-  }
-  .topbar-right {
+    flex-direction: row;
     margin-left: auto;
+  }
+  .nav-link {
+    padding: 8px 11px;
+    font-size: 12.5px;
+  }
+  .side-user {
+    margin-top: 0;
+    padding: 5px 7px;
+  }
+  .side-login {
+    display: none;
+  }
+  .targets {
+    position: static;
   }
   .page,
   .layout {
     padding-inline: 16px;
+  }
+}
+
+@media (max-width: 520px) {
+  .nav-link span,
+  .nav-link {
+    font-size: 0;
+  }
+  .nav-link svg {
+    width: 19px;
+    height: 19px;
   }
 }
 

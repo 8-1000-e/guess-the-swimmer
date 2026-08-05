@@ -20,22 +20,26 @@ function buildError(statusCode: number, payload: unknown): ApiError {
   return { statusCode, message }
 }
 
-async function tryRefresh(): Promise<boolean> {
+export function refreshSession(): Promise<boolean> {
   if (refreshPromise) return refreshPromise
 
   refreshPromise = (async () => {
     const refresh_token = tokenStore.getRefreshToken()
     if (!refresh_token) return false
 
-    const res = await fetch(`${API_BASE_URL}${ROUTES.auth.refresh}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refresh_token }),
-    })
-    if (!res.ok) return false
+    try {
+      const res = await fetch(`${API_BASE_URL}${ROUTES.auth.refresh}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refresh_token }),
+      })
+      if (!res.ok) return false
 
-    tokenStore.set((await res.json()) as Tokens)
-    return true
+      tokenStore.set((await res.json()) as Tokens)
+      return true
+    } catch {
+      return false
+    }
   })().finally(() => {
     refreshPromise = null
   })
@@ -64,7 +68,8 @@ export async function request<T>(
   })
 
   if (res.status === 401 && auth && !_retry) {
-    if (await tryRefresh()) return request<T>(path, { ...options, _retry: true })
+    if (await refreshSession())
+      return request<T>(path, { ...options, _retry: true })
     tokenStore.clear()
     throw buildError(401, { message: 'Session expired' })
   }
