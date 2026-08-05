@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
 import AppShell from '@/components/AppShell'
 import Loading from '@/components/ui/Loading'
 import { api } from '@/api/client'
-import { ROUTES } from '@/api/routes'
+import { intraUrl, ROUTES } from '@/api/routes'
 import type { ApiError } from '@/types/auth'
 import type { RosterEntry } from '@/types/game'
 
@@ -65,9 +64,12 @@ export default function Roster() {
           <ul className="roster">
             {shown.map((p) => (
               <li key={p.login}>
-                <Link
-                  to={`/u/${p.login}`}
+                <a
+                  href={intraUrl(p.login)}
+                  target="_blank"
+                  rel="noreferrer"
                   className={`face ${p.met ? 'is-met' : ''} ${p.me ? 'is-me' : ''}`}
+                  title={`Voir ${p.login} sur l’intra`}
                 >
                   <span className="face-photo">
                     {p.ftPfpUrl ? (
@@ -86,7 +88,18 @@ export default function Roster() {
                   <span className="face-name">
                     {p.me ? 'toi' : p.staff ? 'staff' : (p.displayName ?? '—')}
                   </span>
-                </Link>
+                  <span className="face-out" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="11" height="11" fill="none">
+                      <path
+                        d="M14 4h6v6M20 4l-8.5 8.5M18 14v5a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1h5"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </span>
+                </a>
               </li>
             ))}
           </ul>

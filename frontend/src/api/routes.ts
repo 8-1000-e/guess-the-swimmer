@@ -25,6 +25,10 @@ export const ROUTES = {
   },
 } as const
 
+export function intraUrl(login: string): string {
+  return `https://profile.intra.42.fr/users/${login}`
+}
+
 export function apiUrl(path: string): string {
   return `${API_BASE_URL}${path}`
 }

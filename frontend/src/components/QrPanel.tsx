@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
 import { api } from '@/api/client'
-import { ROUTES } from '@/api/routes'
+import { intraUrl, ROUTES } from '@/api/routes'
 import Surface from './ui/Surface'
 import type { ApiError } from '@/types/auth'
 import type { QrToken, TargetIdentity } from '@/types/game'
@@ -36,7 +36,13 @@ export default function QrPanel({ target, signBonus }: QrPanelProps) {
   return (
     <Surface as="section" className="qr-card">
       <div className="qr-body">
-        <div className="qr-who">
+        <a
+          className="qr-who"
+          href={target ? intraUrl(target.login) : '#'}
+          target="_blank"
+          rel="noreferrer"
+          title={`Voir ${target?.login} sur l’intra`}
+        >
           <span className={`qr-portrait ${online ? 'online' : ''}`}>
             {target?.ftPfpUrl ? (
               <img src={target.ftPfpUrl} alt="" />
@@ -47,13 +53,33 @@ export default function QrPanel({ target, signBonus }: QrPanelProps) {
           </span>
 
           <div className="qr-id">
-            <p className="qr-name">{target?.displayName ?? target?.login}</p>
+            <p className="qr-name">
+              {target?.displayName ?? target?.login}
+              <svg
+                className="qr-out"
+                viewBox="0 0 24 24"
+                width="12"
+                height="12"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M14 4h6v6M20 4l-8.5 8.5M18 14v5a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1h5"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </p>
             <p className="qr-login mono">{target?.login}</p>
             <p className={`qr-where ${online ? 'on' : 'off'}`}>
-              {online ? `En cluster · poste ${target?.location}` : 'Hors ligne'}
+              <span className="qr-where-dot" aria-hidden="true" />
+              {online ? 'En cluster' : 'Hors ligne'}
+              {online && <span className="qr-post mono">{target?.location}</span>}
             </p>
           </div>
-        </div>
+        </a>
 
         <p className="qr-why">
           <strong>{name}</strong> compte déjà dans tes trouvés. Sa signature y
