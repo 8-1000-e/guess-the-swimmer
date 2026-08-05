@@ -55,7 +55,7 @@ export default function Game() {
             />
 
             {game.solved ? (
-              <QrPanel target={game.target} />
+              <QrPanel target={game.target} signBonus={game.signBonus} />
             ) : (
               <Keyboard
                 keys={game.keys}

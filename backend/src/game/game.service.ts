@@ -78,6 +78,11 @@ export class GameService
         return result;
     }
 
+    private signBonus()
+    {
+        return Number(this.config.get('SIGN_BONUS_ATTEMPTS') ?? 5);
+    }
+
     async getTodayRound(ftId: string)
     {
         const user = await this.prisma.user.findUnique({where: {ftId}});
@@ -94,6 +99,7 @@ export class GameService
                 guesses: existing.guesses,
                 status: existing.status,
                 attempts: existing.attempts,
+                signBonus: this.signBonus(),
                 target: existing.status === 'playing' ? null : {
                     login: existing.target.login,
                     displayName: existing.target.displayName,
@@ -139,6 +145,7 @@ export class GameService
                 guesses: [],
                 status: 'playing' as const,
                 attempts: 0,
+                signBonus: this.signBonus(),
                 target: null,
             };
         }
@@ -156,6 +163,7 @@ export class GameService
                 guesses: raced!.guesses,
                 status: raced!.status,
                 attempts: raced!.attempts,
+                signBonus: this.signBonus(),
                 target: raced!.status === 'playing' ? null : {
                     login: raced!.target.login,
                     displayName: raced!.target.displayName,
@@ -289,7 +297,7 @@ export class GameService
         if (round.playerId === scanner.ftId)
             throw new BadRequestException('You cannot sign your own round');
 
-        const bonus = Number(this.config.get('SIGN_BONUS_ATTEMPTS') ?? 5);
+        const bonus = this.signBonus();
 
         const { count } = await this.prisma.round.updateMany({
             where: {id: round.id, status: 'solved', signToken: token},

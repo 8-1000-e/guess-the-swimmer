@@ -26,6 +26,7 @@ export interface Round {
   guesses: Guess[]
   status: RoundStatus
   attempts: number
+  signBonus: number
   target: TargetIdentity | null
 }
 

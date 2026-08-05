@@ -800,89 +800,29 @@ body {
 .qr-card {
   position: relative;
   width: 100%;
-  margin-top: 10px;
-  padding: 20px 22px 22px;
+  margin-top: 12px;
+  padding: 22px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-areas:
-    'steps steps'
-    'body  code';
-  column-gap: 24px;
-  row-gap: 18px;
+  column-gap: 26px;
+  align-items: center;
   overflow: hidden;
 }
 .qr-card::after {
   content: '';
   position: absolute;
-  inset: -40% -10% auto auto;
-  width: 320px;
-  height: 320px;
+  inset: -55% -18% auto auto;
+  width: 340px;
+  height: 340px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(102, 179, 255, 0.13), transparent 68%);
+  background: radial-gradient(circle, rgba(102, 179, 255, 0.12), transparent 68%);
   pointer-events: none;
 }
 
-.steps {
-  grid-area: steps;
-  list-style: none;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 0;
-  padding: 0 0 16px;
-  border-bottom: 1px solid var(--line);
-}
-
-.step {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-.step.done {
-  color: var(--correct);
-}
-.step.now {
-  color: var(--sky-soft);
-}
-
-.step-mark {
-  display: grid;
-  place-items: center;
-  width: 17px;
-  height: 17px;
-  border-radius: 50%;
-  border: 1px solid currentColor;
-  font-size: 9px;
-  font-weight: 700;
-}
-.step.done .step-mark {
-  background: rgba(47, 163, 106, 0.16);
-}
-.step.now .step-mark {
-  background: rgba(102, 179, 255, 0.16);
-}
-
-.step-line {
-  flex: 1;
-  height: 1px;
-  min-width: 14px;
-  background: linear-gradient(
-    90deg,
-    rgba(47, 163, 106, 0.5),
-    rgba(102, 179, 255, 0.5)
-  );
-}
-
 .qr-body {
-  grid-area: body;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
   min-width: 0;
 }
 
@@ -895,14 +835,14 @@ body {
 .qr-portrait {
   position: relative;
   flex-shrink: 0;
-  width: 62px;
-  height: 62px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
   padding: 2px;
   background: var(--line-strong);
 }
 .qr-portrait.online {
-  background: linear-gradient(140deg, var(--correct), rgba(47, 163, 106, 0.25));
+  background: linear-gradient(140deg, var(--correct), rgba(47, 163, 106, 0.2));
 }
 .qr-portrait img,
 .qr-portrait-empty {
@@ -918,8 +858,8 @@ body {
   position: absolute;
   right: 1px;
   bottom: 1px;
-  width: 13px;
-  height: 13px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
   border: 2.5px solid #0a0f16;
   background: var(--dimmer);
@@ -945,10 +885,10 @@ body {
 
 .qr-name {
   margin: 0;
-  font-size: 19px;
+  font-size: 20px;
   font-weight: 600;
   line-height: 1.2;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.022em;
 }
 
 .qr-login {
@@ -958,21 +898,27 @@ body {
 }
 
 .qr-where {
-  margin: 6px 0 0;
-  font-size: 10px;
-  letter-spacing: 0.06em;
+  display: inline-block;
+  margin: 8px 0 0;
+  padding: 3px 9px;
+  border-radius: var(--r-pill);
+  font-size: 10.5px;
+  letter-spacing: 0.02em;
+  border: 1px solid currentColor;
 }
 .qr-where.on {
   color: var(--correct);
+  background: rgba(47, 163, 106, 0.1);
 }
 .qr-where.off {
   color: var(--dimmer);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .qr-why {
   margin: 0;
   font-size: 13px;
-  line-height: 1.6;
+  line-height: 1.65;
   color: var(--dim);
 }
 .qr-why strong {
@@ -980,19 +926,7 @@ body {
   color: var(--paper);
 }
 
-.qr-tip {
-  margin: auto 0 0;
-  padding: 8px 12px;
-  border-radius: var(--r-sm);
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.03);
-  font-size: 10px;
-  letter-spacing: 0.05em;
-  color: var(--dim);
-}
-
 .qr-code {
-  grid-area: code;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1002,8 +936,8 @@ body {
 .qr-frame {
   display: grid;
   place-items: center;
-  width: 192px;
-  height: 192px;
+  width: 182px;
+  height: 182px;
   background: #fff;
   border-radius: var(--r-md);
   line-height: 0;
@@ -1027,8 +961,8 @@ body {
 }
 
 .qr-skeleton {
-  width: 168px;
-  height: 168px;
+  width: 158px;
+  height: 158px;
   border-radius: 6px;
   background: linear-gradient(100deg, #e9edf1 30%, #f7f9fb 50%, #e9edf1 70%);
   background-size: 220% 100%;
@@ -1538,17 +1472,13 @@ body {
 @media (max-width: 620px) {
   .qr-card {
     grid-template-columns: minmax(0, 1fr);
-    grid-template-areas:
-      'steps'
-      'body'
-      'code';
-    row-gap: 16px;
+    row-gap: 20px;
+    justify-items: center;
+    text-align: center;
   }
-  .steps {
-    font-size: 9px;
-  }
-  .qr-tip {
-    margin-top: 0;
+  .qr-who {
+    flex-direction: column;
+    text-align: center;
   }
 }
 
