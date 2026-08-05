@@ -20,6 +20,19 @@ const ICONS = {
       strokeLinecap="round"
     />
   ),
+  faces: (
+    <>
+      <circle cx="8.5" cy="9" r="2.6" stroke="currentColor" strokeWidth="1.5" />
+      <circle cx="16" cy="9" r="2.6" stroke="currentColor" strokeWidth="1.5" />
+      <path
+        d="M3.5 18.5c.8-2.4 2.6-3.6 5-3.6s4.2 1.2 5 3.6M13.5 18.5c.8-2.4 2.6-3.6 5-3.6 1 0 1.9.2 2.6.6"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        fill="none"
+        strokeLinecap="round"
+      />
+    </>
+  ),
   user: (
     <>
       <circle cx="12" cy="8.5" r="3.4" stroke="currentColor" strokeWidth="1.6" />
@@ -56,6 +69,10 @@ export default function AppShell({ children }: { children: ReactNode }) {
           <NavLink to="/" end className="nav-link">
             <Icon>{ICONS.game}</Icon>
             Jeu
+          </NavLink>
+          <NavLink to="/trombinoscope" className="nav-link">
+            <Icon>{ICONS.faces}</Icon>
+            Trombinoscope
           </NavLink>
           <NavLink to="/leaderboard" className="nav-link">
             <Icon>{ICONS.board}</Icon>

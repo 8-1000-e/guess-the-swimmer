@@ -1,12 +1,13 @@
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
-import { AuthProvider } from '@/auth/AuthContext'
-import ProtectedRoute from '@/components/ProtectedRoute'
-import AuthCallback from '@/pages/AuthCallback'
-import Game from '@/pages/Game'
-import Leaderboard from '@/pages/Leaderboard'
-import Login from '@/pages/Login'
-import Profile from '@/pages/Profile'
-import Sign from '@/pages/Sign'
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { AuthProvider } from "@/auth/AuthContext";
+import ProtectedRoute from "@/components/ProtectedRoute";
+import AuthCallback from "@/pages/AuthCallback";
+import Game from "@/pages/Game";
+import Leaderboard from "@/pages/Leaderboard";
+import Login from "@/pages/Login";
+import Profile from "@/pages/Profile";
+import Roster from "@/pages/Roster";
+import Sign from "@/pages/Sign";
 
 export default function App() {
   return (
@@ -33,6 +34,14 @@ export default function App() {
             }
           />
           <Route
+            path="/trombinoscope"
+            element={
+              <ProtectedRoute>
+                <Roster />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/u/:login"
             element={
               <ProtectedRoute>
@@ -44,5 +53,5 @@ export default function App() {
         </Routes>
       </AuthProvider>
     </BrowserRouter>
-  )
+  );
 }

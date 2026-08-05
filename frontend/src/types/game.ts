@@ -73,3 +73,12 @@ export interface UserStats {
   played: number
   rounds: UserRound[]
 }
+
+export interface RosterEntry {
+  login: string
+  displayName: string | null
+  ftPfpUrl: string | null
+  staff: boolean
+  me: boolean
+  met: boolean
+}

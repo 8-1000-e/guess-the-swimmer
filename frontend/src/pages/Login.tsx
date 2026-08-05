@@ -197,7 +197,7 @@ export default function Login() {
           Se connecter avec 42
         </button>
 
-        <p className="login-meta">Août 2026 · Angoulême · une cible par jour</p>
+        <p className="login-meta">Août 2026 · Angoulême</p>
       </div>
     </main>
   )

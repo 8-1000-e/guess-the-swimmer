@@ -17,6 +17,7 @@ export const ROUTES = {
     round: '/game/round',
     guess: '/game/guess',
     targets: '/game/targets',
+    roster: '/game/roster',
     qr: '/game/qr',
     sign: '/game/sign',
     leaderboard: '/game/leaderboard',
