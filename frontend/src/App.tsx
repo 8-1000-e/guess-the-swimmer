@@ -1,5 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "@/auth/AuthContext";
+import { ToastProvider } from "@/toast/ToastContext";
+import Toaster from "@/toast/Toaster";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import AuthCallback from "@/pages/AuthCallback";
 import Game from "@/pages/Game";
@@ -13,7 +15,8 @@ import Sign from "@/pages/Sign";
 export default function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
+      <ToastProvider>
+        <AuthProvider>
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
@@ -61,6 +64,8 @@ export default function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </AuthProvider>
+        <Toaster />
+      </ToastProvider>
     </BrowserRouter>
   );
 }

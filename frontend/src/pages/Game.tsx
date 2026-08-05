@@ -40,12 +40,6 @@ export default function Game() {
               </p>
             </header>
 
-            <p
-              className={`message ${game.message ? 'err' : ''}`}
-              aria-live="polite"
-            >
-              {game.message || ' '}
-            </p>
 
             <Board
               rows={game.rows}

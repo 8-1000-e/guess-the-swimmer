@@ -66,11 +66,16 @@ export async function request<T>(
     if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`
   }
 
-  const res = await fetch(`${API_BASE_URL}${path}`, {
-    method,
-    headers,
-    body: body !== undefined ? JSON.stringify(body) : undefined,
-  })
+  let res: Response
+  try {
+    res = await fetch(`${API_BASE_URL}${path}`, {
+      method,
+      headers,
+      body: body !== undefined ? JSON.stringify(body) : undefined,
+    })
+  } catch {
+    throw buildError(0, { message: 'Failed to fetch' })
+  }
 
   if (res.status === 401 && auth && !_retry) {
     if (await refreshSession())

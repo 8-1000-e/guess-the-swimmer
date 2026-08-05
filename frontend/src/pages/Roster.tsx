@@ -4,9 +4,12 @@ import Loading from '@/components/ui/Loading'
 import { api } from '@/api/client'
 import { intraUrl, ROUTES } from '@/api/routes'
 import type { ApiError } from '@/types/auth'
+import { toFrench } from '@/api/errors'
+import { useToast } from '@/toast/useToast'
 import type { RosterEntry } from '@/types/game'
 
 export default function Roster() {
+  const { push } = useToast()
   const [people, setPeople] = useState<RosterEntry[] | null>(null)
   const [error, setError] = useState('')
   const [query, setQuery] = useState('')
@@ -15,8 +18,12 @@ export default function Roster() {
     api
       .get<RosterEntry[]>(ROUTES.game.roster)
       .then(setPeople)
-      .catch((e: ApiError) => setError(e.message))
-  }, [])
+      .catch((e: ApiError) => {
+        const { title, detail } = toFrench(e)
+        setError(title)
+        push('error', title, detail)
+      })
+  }, [push])
 
   const shown = useMemo(() => {
     if (!people) return []

@@ -558,6 +558,118 @@ body {
   color: var(--dimmer);
 }
 
+/* ── toasts ───────────────────────────────────────────────── */
+
+.toaster {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  width: min(340px, calc(100vw - 40px));
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  padding: 12px 13px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-md);
+  background: rgba(12, 17, 24, 0.86);
+  backdrop-filter: blur(20px) saturate(170%);
+  -webkit-backdrop-filter: blur(20px) saturate(170%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 18px 40px -18px rgba(0, 0, 0, 0.95);
+  pointer-events: auto;
+  animation: toast-in 0.3s var(--ease) both;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+}
+
+.toast-mark {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+}
+.toast.error .toast-mark {
+  color: var(--danger-soft);
+  background: rgba(229, 83, 75, 0.16);
+  border: 1px solid rgba(229, 83, 75, 0.4);
+}
+.toast.success .toast-mark {
+  color: var(--correct);
+  background: rgba(47, 163, 106, 0.16);
+  border: 1px solid rgba(47, 163, 106, 0.4);
+}
+.toast.info .toast-mark {
+  color: var(--sky-soft);
+  background: rgba(102, 179, 255, 0.16);
+  border: 1px solid rgba(102, 179, 255, 0.4);
+}
+
+.toast-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+.toast-body strong {
+  font-weight: 600;
+}
+.toast-body span {
+  font-size: 12px;
+  color: var(--dim);
+}
+
+.toast-close {
+  flex-shrink: 0;
+  padding: 0 2px;
+  border: 0;
+  background: transparent;
+  color: var(--dimmer);
+  font-size: 11px;
+  cursor: pointer;
+  transition: color 0.16s var(--ease);
+}
+.toast-close:hover {
+  color: var(--paper);
+}
+
+.how-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+@media (max-width: 620px) {
+  .toaster {
+    right: 12px;
+    left: 12px;
+    bottom: 12px;
+    width: auto;
+  }
+}
+
 /* ── comment ça marche ────────────────────────────────────── */
 
 .how-steps {

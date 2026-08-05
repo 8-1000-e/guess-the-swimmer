@@ -8,6 +8,8 @@ import AnimatedGradient from '@/components/ui/animated-gradient'
 import Loading from '@/components/ui/Loading'
 import Surface from '@/components/ui/Surface'
 import type { ApiError } from '@/types/auth'
+import { toFrench } from '@/api/errors'
+import { useToast } from '@/toast/useToast'
 import type { SignResponse } from '@/types/game'
 
 export const PENDING_SIGN_KEY = 'gts_pending_sign'
@@ -15,6 +17,7 @@ export const PENDING_SIGN_KEY = 'gts_pending_sign'
 export default function Sign() {
   const { token = '' } = useParams()
   const { isAuthenticated, loading, loginWith42 } = useAuth()
+  const { push } = useToast()
   const reducedMotion = useReducedMotion()
   const [result, setResult] = useState<SignResponse | null>(null)
   const [error, setError] = useState('')
@@ -37,9 +40,16 @@ export default function Sign() {
     done.current = true
     api
       .post<SignResponse>(ROUTES.game.sign, { token })
-      .then(setResult)
-      .catch((e: ApiError) => setError(e.message))
-  }, [loading, isAuthenticated, token, loginWith42])
+      .then((r) => {
+        setResult(r)
+        push('success', 'Signature enregistrée')
+      })
+      .catch((e: ApiError) => {
+        const { title, detail } = toFrench(e)
+        setError(title)
+        push('error', title, detail)
+      })
+  }, [loading, isAuthenticated, token, loginWith42, push])
 
   return (
     <main className="auth">

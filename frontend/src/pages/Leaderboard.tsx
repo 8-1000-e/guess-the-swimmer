@@ -8,10 +8,13 @@ import { api } from '@/api/client'
 import { ROUTES } from '@/api/routes'
 import { useAuth } from '@/auth/useAuth'
 import type { ApiError } from '@/types/auth'
+import { toFrench } from '@/api/errors'
+import { useToast } from '@/toast/useToast'
 import type { LeaderboardRow } from '@/types/game'
 
 export default function Leaderboard() {
   const { user } = useAuth()
+  const { push } = useToast()
   const [rows, setRows] = useState<LeaderboardRow[] | null>(null)
   const [error, setError] = useState('')
 
@@ -19,8 +22,12 @@ export default function Leaderboard() {
     api
       .get<LeaderboardRow[]>(ROUTES.game.leaderboard)
       .then(setRows)
-      .catch((e: ApiError) => setError(e.message))
-  }, [])
+      .catch((e: ApiError) => {
+        const { title, detail } = toFrench(e)
+        setError(title)
+        push('error', title, detail)
+      })
+  }, [push])
 
   return (
     <AppShell>

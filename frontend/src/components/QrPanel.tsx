@@ -4,6 +4,8 @@ import { api } from '@/api/client'
 import { intraUrl, ROUTES } from '@/api/routes'
 import Surface from './ui/Surface'
 import type { ApiError } from '@/types/auth'
+import { toFrench } from '@/api/errors'
+import { useToast } from '@/toast/useToast'
 import type { QrToken, TargetIdentity } from '@/types/game'
 
 interface QrPanelProps {
@@ -12,6 +14,7 @@ interface QrPanelProps {
 }
 
 export default function QrPanel({ target, signBonus }: QrPanelProps) {
+  const { push } = useToast()
   const [qr, setQr] = useState<QrToken | null>(null)
   const [error, setError] = useState('')
 
@@ -20,9 +23,11 @@ export default function QrPanel({ target, signBonus }: QrPanelProps) {
       setQr(await api.get<QrToken>(ROUTES.game.qr))
       setError('')
     } catch (e) {
-      setError((e as ApiError).message)
+      const { title, detail } = toFrench(e as ApiError)
+      setError(title)
+      push('error', title, detail)
     }
-  }, [])
+  }, [push])
 
   useEffect(() => {
     void refresh()

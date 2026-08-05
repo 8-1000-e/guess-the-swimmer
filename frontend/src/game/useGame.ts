@@ -9,6 +9,8 @@ import type {
   Round,
 } from '@/types/game'
 import type { ApiError } from '@/types/auth'
+import { toFrench } from '@/api/errors'
+import { useToast } from '@/toast/useToast'
 
 function keyboardStates(rows: LetterResult[][]): Record<string, LetterState> {
   const rank: Record<LetterState, number> = { absent: 0, present: 1, correct: 2 }
@@ -23,9 +25,9 @@ function keyboardStates(rows: LetterResult[][]): Record<string, LetterState> {
 }
 
 export function useGame() {
+  const { push } = useToast()
   const [round, setRound] = useState<Round | null>(null)
   const [current, setCurrent] = useState('')
-  const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
 
@@ -36,10 +38,11 @@ export function useGame() {
 
   useEffect(() => {
     load().catch((e: ApiError) => {
-      setMessage(e.message)
+      const { title, detail } = toFrench(e)
+      push('error', title, detail)
       setLoading(false)
     })
-  }, [load])
+  }, [load, push])
 
   const length = round?.length ?? 0
   const solved = round?.status !== 'playing' && round !== null
@@ -47,21 +50,23 @@ export function useGame() {
   const type = useCallback(
     (letter: string) => {
       if (solved) return
-      setMessage('')
       setCurrent((c) => (c.length >= length ? c : c + letter.toLowerCase()))
     },
     [solved, length],
   )
 
   const backspace = useCallback(() => {
-    setMessage('')
     setCurrent((c) => c.slice(0, -1))
   }, [])
 
   const submit = useCallback(async () => {
     if (solved || submitting || !round) return
     if (current.length !== round.length) {
-      setMessage(`Il faut ${round.length} lettres`)
+      push(
+        'error',
+        `Il faut ${round.length} lettres`,
+        `Tu en as saisi ${current.length}.`,
+      )
       return
     }
 
@@ -82,14 +87,17 @@ export function useGame() {
         attempts: res.attempts,
       })
       setCurrent('')
-      setMessage('')
-      if (res.solved) await load()
+      if (res.solved) {
+        push('success', 'Trouvé !', 'Reste à la faire signer.')
+        await load()
+      }
     } catch (e) {
-      setMessage((e as ApiError).message)
+      const { title, detail } = toFrench(e as ApiError)
+      push('error', title, detail)
     } finally {
       setSubmitting(false)
     }
-  }, [solved, submitting, round, current, load])
+  }, [solved, submitting, round, current, load, push])
 
   const rows = useMemo(() => round?.guesses.map((g) => g.result) ?? [], [round])
   const keys = useMemo(() => keyboardStates(rows), [rows])
@@ -103,7 +111,6 @@ export function useGame() {
     attempts: round?.attempts ?? 0,
     signBonus: round?.signBonus ?? 5,
     solved,
-    message,
     loading,
     submitting,
     keys,
