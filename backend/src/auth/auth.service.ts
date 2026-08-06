@@ -37,7 +37,7 @@ export class AuthService {
     const login = profile.login.trim().toLowerCase();
 
     const swimmer = await this.prisma.swimmer.findUnique({ where: { login } });
-    if (!swimmer) throw new FtAuthRejection('not_in_pool');
+    if (!swimmer || !swimmer.active) throw new FtAuthRejection('not_in_pool');
 
     const ftId = String(profile.id);
     const identity = {
@@ -94,8 +94,9 @@ export class AuthService {
 
     const user = await this.prisma.user.findUnique({
       where: { ftId: stored.ftId },
+      include: { swimmer: { select: { active: true } } },
     });
-    if (!user) throw new UnauthorizedException();
+    if (!user?.swimmer.active) throw new UnauthorizedException();
 
     return this.issueTokens(user.ftId, user.login);
   }
