@@ -109,7 +109,7 @@ export function useGame() {
     current,
     length,
     attempts: round?.attempts ?? 0,
-    signBonus: round?.signBonus ?? 5,
+    signBonus: round?.signBonus ?? 1,
     solved,
     loading,
     submitting,

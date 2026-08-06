@@ -88,7 +88,7 @@ export class GameService
 
     private signBonus()
     {
-        return Number(this.config.get('SIGN_BONUS_ATTEMPTS') ?? 5);
+        return Number(this.config.get('SIGN_BONUS_ATTEMPTS') ?? 1);
     }
 
     async getTodayRound(ftId: string)

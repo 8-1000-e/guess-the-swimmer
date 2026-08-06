@@ -1,50 +1,50 @@
-import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
-import AppShell from '@/components/AppShell'
-import Surface from '@/components/ui/Surface'
-import { api } from '@/api/client'
-import { ROUTES } from '@/api/routes'
-import type { Round } from '@/types/game'
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import AppShell from "@/components/AppShell";
+import Surface from "@/components/ui/Surface";
+import { api } from "@/api/client";
+import { ROUTES } from "@/api/routes";
+import type { Round } from "@/types/game";
 
 const DEMO = [
-  { letter: 'v', state: 'correct' },
-  { letter: 'd', state: 'absent' },
-  { letter: 'u', state: 'present' },
-  { letter: 'r', state: 'absent' },
-  { letter: 'y', state: 'correct' },
-]
+  { letter: "v", state: "correct" },
+  { letter: "d", state: "absent" },
+  { letter: "u", state: "present" },
+  { letter: "r", state: "absent" },
+  { letter: "y", state: "correct" },
+];
 
 const STEPS = [
   {
-    title: 'Une cible par jour',
-    text: 'Chaque matin, le login d’un autre piscineux est tiré au hasard. Personne d’autre n’a la même.',
+    title: "Une cible par jour",
+    text: "Chaque matin, le login d’un autre piscineux est tiré au hasard. Personne d’autre n’a la même.",
   },
   {
-    title: 'Devine son login',
-    text: 'Autant d’essais que tu veux, mais chacun compte. Une proposition doit être un login existant, de la même longueur.',
+    title: "Devine son login",
+    text: "Autant d’essais que tu veux, mais chacun compte. Une proposition doit être un login existant, de la même longueur.",
   },
   {
-    title: 'Va le voir en vrai',
-    text: 'Trouvé, tu obtiens un QR code. C’est la personne elle-même qui le scanne, depuis son compte 42.',
+    title: "Va le voir en vrai",
+    text: "Trouvé, tu obtiens un QR code. C’est la personne elle-même qui le scanne, depuis son compte 42.",
   },
-]
+];
 
 const RULES = [
-  'À minuit, heure de Paris, la manche du jour se termine, trouvée ou non.',
-  'Une cible signée ne retombe jamais. Une cible non signée, si.',
-  'Le staff joue aussi, et peuvent te tomber comme cible.',
-  'Une capture d’écran du QR ne sert à rien : le code change toutes les 30 secondes et c’est le compte du scanneur qui compte.',
-]
+  "À minuit, heure de Paris, la manche du jour se termine, trouvée ou non.",
+  "Une cible signée ne retombe jamais. Une cible non signée, si.",
+  "Le staff joue aussi, et peuvent te tomber comme cible.",
+  "Une capture d’écran du QR ne sert à rien : le code change toutes les 30 secondes et c’est le compte du scanneur qui compte.",
+];
 
 export default function HowItWorks() {
-  const [bonus, setBonus] = useState<number | null>(null)
+  const [bonus, setBonus] = useState<number | null>(null);
 
   useEffect(() => {
     api
       .get<Round>(ROUTES.game.round)
       .then((r) => setBonus(r.signBonus))
-      .catch(() => setBonus(null))
-  }, [])
+      .catch(() => setBonus(null));
+  }, []);
 
   return (
     <AppShell>
@@ -101,9 +101,9 @@ export default function HowItWorks() {
             Le plus bas gagne.
           </p>
           <p className="how-text">
-            Chaque signature efface {bonus ?? 'plusieurs'} essais de ton total.
-            C’est ce qui récompense d’aller parler aux gens plutôt que de
-            deviner vite.
+            Chaque signature efface {bonus ?? "un"} essai
+            {bonus && bonus > 1 ? "s" : ""} de ton total. C’est ce qui
+            récompense d’aller parler aux gens plutôt que de deviner vite.
           </p>
         </Surface>
 
@@ -121,5 +121,5 @@ export default function HowItWorks() {
         </p>
       </main>
     </AppShell>
-  )
+  );
 }

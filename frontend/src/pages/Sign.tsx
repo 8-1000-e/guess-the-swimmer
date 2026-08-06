@@ -1,55 +1,55 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
-import { api } from '@/api/client'
-import { ROUTES } from '@/api/routes'
-import { useAuth } from '@/auth/useAuth'
-import { useReducedMotion } from '@/hooks/useReducedMotion'
-import AnimatedGradient from '@/components/ui/animated-gradient'
-import Loading from '@/components/ui/Loading'
-import Surface from '@/components/ui/Surface'
-import type { ApiError } from '@/types/auth'
-import { toFrench } from '@/api/errors'
-import { useToast } from '@/toast/useToast'
-import type { SignResponse } from '@/types/game'
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import { api } from "@/api/client";
+import { ROUTES } from "@/api/routes";
+import { useAuth } from "@/auth/useAuth";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
+import AnimatedGradient from "@/components/ui/animated-gradient";
+import Loading from "@/components/ui/Loading";
+import Surface from "@/components/ui/Surface";
+import type { ApiError } from "@/types/auth";
+import { toFrench } from "@/api/errors";
+import { useToast } from "@/toast/useToast";
+import type { SignResponse } from "@/types/game";
 
-export const PENDING_SIGN_KEY = 'gts_pending_sign'
+export const PENDING_SIGN_KEY = "gts_pending_sign";
 
 export default function Sign() {
-  const { token = '' } = useParams()
-  const { isAuthenticated, loading, loginWith42 } = useAuth()
-  const { push } = useToast()
-  const reducedMotion = useReducedMotion()
-  const [result, setResult] = useState<SignResponse | null>(null)
-  const [error, setError] = useState('')
-  const done = useRef(false)
+  const { token = "" } = useParams();
+  const { isAuthenticated, loading, loginWith42 } = useAuth();
+  const { push } = useToast();
+  const reducedMotion = useReducedMotion();
+  const [result, setResult] = useState<SignResponse | null>(null);
+  const [error, setError] = useState("");
+  const done = useRef(false);
 
   const gradient = useMemo(
-    () => ({ preset: 'Prism' as const, speed: reducedMotion ? 0 : 18 }),
+    () => ({ preset: "Prism" as const, speed: reducedMotion ? 0 : 18 }),
     [reducedMotion],
-  )
+  );
 
   useEffect(() => {
-    if (loading || done.current) return
+    if (loading || done.current) return;
 
     if (!isAuthenticated) {
-      sessionStorage.setItem(PENDING_SIGN_KEY, token)
-      loginWith42()
-      return
+      sessionStorage.setItem(PENDING_SIGN_KEY, token);
+      loginWith42();
+      return;
     }
 
-    done.current = true
+    done.current = true;
     api
       .post<SignResponse>(ROUTES.game.sign, { token })
       .then((r) => {
-        setResult(r)
-        push('success', 'Signature enregistrée')
+        setResult(r);
+        push("success", "Signature enregistrée");
       })
       .catch((e: ApiError) => {
-        const { title, detail } = toFrench(e)
-        setError(title)
-        push('error', title, detail)
-      })
-  }, [loading, isAuthenticated, token, loginWith42, push])
+        const { title, detail } = toFrench(e);
+        setError(title);
+        push("error", title, detail);
+      });
+  }, [loading, isAuthenticated, token, loginWith42, push]);
 
   return (
     <main className="auth">
@@ -58,7 +58,7 @@ export default function Sign() {
 
       <Surface as="section" className="auth-card">
         {(loading || (!result && !error)) && (
-          <Loading label={loading ? 'Connexion' : 'Validation'} />
+          <Loading label={loading ? "Connexion" : "Validation"} />
         )}
 
         {error && (
@@ -78,8 +78,9 @@ export default function Sign() {
             </div>
             <h1 className="auth-title">C’est signé</h1>
             <p className="auth-sub">
-              <span className="qr-target">{result.player?.login}</span> valide sa
-              cible et récupère {result.bonus} essais.
+              <span className="qr-target">{result.player?.login}</span> valide
+              sa cible et récupère {result.bonus} essai
+              {result.bonus > 1 ? "s" : ""}.
             </p>
           </>
         )}
@@ -91,5 +92,5 @@ export default function Sign() {
         </div>
       </Surface>
     </main>
-  )
+  );
 }

@@ -1,54 +1,55 @@
-import { useCallback, useEffect, useState } from 'react'
-import { QRCodeSVG } from 'qrcode.react'
-import { api } from '@/api/client'
-import { intraUrl, ROUTES } from '@/api/routes'
-import Surface from './ui/Surface'
-import type { ApiError } from '@/types/auth'
-import { toFrench } from '@/api/errors'
-import { useToast } from '@/toast/useToast'
-import type { QrToken, TargetIdentity } from '@/types/game'
+import { useCallback, useEffect, useState } from "react";
+import { QRCodeSVG } from "qrcode.react";
+import { api } from "@/api/client";
+import { intraUrl, ROUTES } from "@/api/routes";
+import Surface from "./ui/Surface";
+import type { ApiError } from "@/types/auth";
+import { toFrench } from "@/api/errors";
+import { useToast } from "@/toast/useToast";
+import type { QrToken, TargetIdentity } from "@/types/game";
 
 interface QrPanelProps {
-  target: TargetIdentity | null
-  signBonus: number
+  target: TargetIdentity | null;
+  signBonus: number;
 }
 
 export default function QrPanel({ target, signBonus }: QrPanelProps) {
-  const { push } = useToast()
-  const [qr, setQr] = useState<QrToken | null>(null)
-  const [error, setError] = useState('')
+  const { push } = useToast();
+  const [qr, setQr] = useState<QrToken | null>(null);
+  const [error, setError] = useState("");
 
   const refresh = useCallback(async () => {
     try {
-      setQr(await api.get<QrToken>(ROUTES.game.qr))
-      setError('')
+      setQr(await api.get<QrToken>(ROUTES.game.qr));
+      setError("");
     } catch (e) {
-      const { title, detail } = toFrench(e as ApiError)
-      setError(title)
-      push('error', title, detail)
+      const { title, detail } = toFrench(e as ApiError);
+      setError(title);
+      push("error", title, detail);
     }
-  }, [push])
+  }, [push]);
 
   useEffect(() => {
-    void refresh()
-    const id = setInterval(() => void refresh(), 30_000)
-    return () => clearInterval(id)
-  }, [refresh])
+    void refresh();
+    const id = setInterval(() => void refresh(), 30_000);
+    return () => clearInterval(id);
+  }, [refresh]);
 
-  const name = target?.displayName?.split(' ')[0] ?? target?.login ?? 'ta cible'
-  const online = Boolean(target?.location)
+  const name =
+    target?.displayName?.split(" ")[0] ?? target?.login ?? "ta cible";
+  const online = Boolean(target?.location);
 
   return (
     <Surface as="section" className="qr-card">
       <div className="qr-body">
         <a
           className="qr-who"
-          href={target ? intraUrl(target.login) : '#'}
+          href={target ? intraUrl(target.login) : "#"}
           target="_blank"
           rel="noreferrer"
           title={`Voir ${target?.login} sur l’intra`}
         >
-          <span className={`qr-portrait ${online ? 'online' : ''}`}>
+          <span className={`qr-portrait ${online ? "online" : ""}`}>
             {target?.ftPfpUrl ? (
               <img src={target.ftPfpUrl} alt="" />
             ) : (
@@ -78,18 +79,20 @@ export default function QrPanel({ target, signBonus }: QrPanelProps) {
               </svg>
             </p>
             <p className="qr-login mono">{target?.login}</p>
-            <p className={`qr-where ${online ? 'on' : 'off'}`}>
+            <p className={`qr-where ${online ? "on" : "off"}`}>
               <span className="qr-where-dot" aria-hidden="true" />
-              {online ? 'En cluster' : 'Hors ligne'}
-              {online && <span className="qr-post mono">{target?.location}</span>}
+              {online ? "En cluster" : "Hors ligne"}
+              {online && (
+                <span className="qr-post mono">{target?.location}</span>
+              )}
             </p>
           </div>
         </a>
 
         <p className="qr-why">
-          Pas de signature, pas de
-          point : c’est elle qui prouve que vous vous êtes rencontrés, et elle
-          efface {signBonus} essais. Sans elle, <strong>{name}</strong> pourra
+          Pas de signature, pas de point : c’est elle qui prouve que vous vous
+          êtes rencontrés, et elle efface {signBonus} essai
+          {signBonus > 1 ? "s" : ""}. Sans elle, <strong>{name}</strong> pourra
           retomber.
         </p>
       </div>
@@ -114,5 +117,5 @@ export default function QrPanel({ target, signBonus }: QrPanelProps) {
         <p className="hint">Nouveau code toutes les 30 s</p>
       </div>
     </Surface>
-  )
+  );
 }
