@@ -1316,6 +1316,90 @@ body {
   color: #8a95a3;
 }
 
+.signed-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  width: 100%;
+  margin-top: 12px;
+  padding: 20px 22px;
+  overflow: hidden;
+}
+.signed-card::after {
+  content: '';
+  position: absolute;
+  inset: -60% -20% auto auto;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(47, 163, 106, 0.16), transparent 68%);
+  pointer-events: none;
+}
+
+.signed-mark {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(47, 163, 106, 0.45);
+  background: rgba(47, 163, 106, 0.16);
+  color: var(--correct);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.signed-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.signed-step {
+  margin: 0;
+  font-size: 9.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--correct);
+}
+
+.signed-title {
+  margin: 5px 0 7px;
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.signed-text {
+  margin: 0 0 8px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--dim);
+}
+
+.signed-face {
+  flex-shrink: 0;
+  display: block;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid rgba(47, 163, 106, 0.5);
+  transition: opacity 0.18s var(--ease);
+}
+.signed-face:hover {
+  opacity: 0.85;
+}
+.signed-face img,
+.signed-face-empty {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: var(--ink-2);
+}
+
 /* ── tables ───────────────────────────────────────────────── */
 
 .table-wrap {

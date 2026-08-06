@@ -77,7 +77,7 @@ export class PoolService implements OnModuleInit {
 
       await this.prisma.swimmer.upsert({
         where: { login },
-        update: { ...(identity ?? {}), staff: true, syncedAt: now },
+        update: { ...(identity ?? {}), staff: true, active: true, syncedAt: now },
         create: { login, ...(identity ?? {}), staff: true },
       });
     }
@@ -115,6 +115,7 @@ export class PoolService implements OnModuleInit {
           poolMonth: month,
           poolYear: year,
           staff: false,
+          active: true,
           syncedAt: now,
         },
         create: {
@@ -129,19 +130,25 @@ export class PoolService implements OnModuleInit {
 
     const staff = await this.syncStaff(staffLogins, now);
 
-    const stale = await this.prisma.swimmer.findMany({
-      where: { syncedAt: { lt: now }, staff: false },
+    const { count: retired } = await this.prisma.swimmer.updateMany({
+      where: { syncedAt: { lt: now }, active: true },
+      data: { active: false },
+    });
+
+    const inactive = await this.prisma.swimmer.findMany({
+      where: { active: false },
       select: { login: true },
     });
 
     this.logger.log(
       `piscine ${month} ${year} campus ${campusId}: ${swimmers.length} piscineux, ${staff} hors-piscine`,
     );
-    if (stale.length)
-      this.logger.warn(
-        `${stale.length} login(s) en base absents de l'API: ${stale.map((s) => s.login).join(', ')}`,
+    if (retired) this.logger.log(`${retired} login(s) désactivés ce sync`);
+    if (inactive.length)
+      this.logger.log(
+        `${inactive.length} inactif(s): ${inactive.map((s) => s.login).join(', ')}`,
       );
 
-    return { swimmers: swimmers.length, staff, stale: stale.length };
+    return { swimmers: swimmers.length, staff, retired };
   }
 }

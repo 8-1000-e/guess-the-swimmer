@@ -3,6 +3,7 @@ import AppShell from '@/components/AppShell'
 import Board from '@/components/Board'
 import Keyboard from '@/components/Keyboard'
 import QrPanel from '@/components/QrPanel'
+import SignedCard from '@/components/SignedCard'
 import Loading from '@/components/ui/Loading'
 import { useGame } from '@/game/useGame'
 
@@ -32,7 +33,11 @@ export default function Game() {
             <header className="game-head">
               <p className="game-eyebrow mono">Cible du jour</p>
               <h1 className="game-title">
-                {game.solved ? 'Trouvée' : `${game.length} lettres`}
+                {game.validated
+                  ? 'Validée'
+                  : game.solved
+                    ? 'Trouvée'
+                    : `${game.length} lettres`}
               </h1>
               <p className="game-meta mono">
                 {tries} essai{tries > 1 ? 's' : ''}
@@ -48,7 +53,9 @@ export default function Game() {
               solved={game.solved}
             />
 
-            {game.solved ? (
+            {game.validated ? (
+              <SignedCard target={game.target} signBonus={game.signBonus} />
+            ) : game.solved ? (
               <QrPanel target={game.target} signBonus={game.signBonus} />
             ) : (
               <Keyboard

@@ -5,6 +5,7 @@ const MESSAGES: Record<string, string> = {
   'Guess too long': 'Login trop long',
   'Not a valid login': 'Ce login n’existe pas',
   'Target already found': 'Cible déjà trouvée',
+  'Target still not found': 'Manche déjà validée',
   'No target left': 'Plus aucune cible disponible',
   'Invalid token': 'Code QR invalide',
   'Token expired': 'Code QR expiré',

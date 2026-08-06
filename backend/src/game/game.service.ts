@@ -128,7 +128,7 @@ export class GameService
         excluded.push("edubois-");
 
         const potentialTargets = await this.prisma.swimmer.findMany({
-            where: {login: { notIn: excluded}},
+            where: {active: true, login: {notIn: [...excluded, ...this.hidden()]}},
             select: {login: true},
         });
         
@@ -248,7 +248,7 @@ export class GameService
         const guessed = new Set(today?.guesses.map(g => g.value) ?? []);
 
         const swimmers = await this.prisma.swimmer.findMany({
-            where: {login: {notIn: [user.login, "edubois-"]}},
+            where: {active: true, login: {notIn: [user.login, ...this.hidden()]}},
             select: {login: true},
             orderBy: {login: 'asc'},
         });
@@ -345,7 +345,7 @@ export class GameService
         const met = new Set(rounds.map(r => r.targetLogin));
 
         const swimmers = await this.prisma.swimmer.findMany({
-            where: {login: {notIn: this.hidden()}},
+            where: {active: true, login: {notIn: this.hidden()}},
             select: {
                 login: true,
                 displayName: true,
@@ -419,7 +419,7 @@ export class GameService
     async leaderboard()
     {
         const users = await this.prisma.user.findMany({
-            where: {login: {notIn: this.hidden()}},
+            where: {login: {notIn: this.hidden()}, swimmer: {active: true}},
             include: {rounds: {select: {status: true, attempts: true}}},
         });
 

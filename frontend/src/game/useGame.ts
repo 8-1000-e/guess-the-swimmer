@@ -45,7 +45,9 @@ export function useGame() {
   }, [load, push])
 
   const length = round?.length ?? 0
-  const solved = round?.status !== 'playing' && round !== null
+  const status = round?.status ?? 'playing'
+  const solved = round !== null && status !== 'playing'
+  const validated = status === 'validated'
 
   const type = useCallback(
     (letter: string) => {
@@ -99,6 +101,22 @@ export function useGame() {
     }
   }, [solved, submitting, round, current, load, push])
 
+  useEffect(() => {
+    if (status !== 'solved') return
+    const id = setInterval(() => {
+      void api
+        .get<Round>(ROUTES.game.round)
+        .then((r) => {
+          if (r.status === 'validated') {
+            setRound(r)
+            push('success', 'Signature reçue', 'Ta cible est validée.')
+          }
+        })
+        .catch(() => {})
+    }, 15_000)
+    return () => clearInterval(id)
+  }, [status, push])
+
   const rows = useMemo(() => round?.guesses.map((g) => g.result) ?? [], [round])
   const keys = useMemo(() => keyboardStates(rows), [rows])
 
@@ -111,6 +129,8 @@ export function useGame() {
     attempts: round?.attempts ?? 0,
     signBonus: round?.signBonus ?? 1,
     solved,
+    validated,
+    status,
     loading,
     submitting,
     keys,
